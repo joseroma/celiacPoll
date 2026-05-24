@@ -606,6 +606,51 @@
     font-size: 11.5px;
   }
 
+  /* ---------- BENEFITS GRID (buyer profile) ---------- */
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .benefit-card {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .benefit-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .benefit-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+  }
+  .benefit-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    margin-top: 3px;
+  }
+  .benefit-detail {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.55;
+    margin-top: 4px;
+  }
+  .benefit-impact {
+    font-size: 11.5px;
+    color: var(--gold-2);
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--line);
+  }
+
   /* ---------- CHECKLIST ---------- */
   .checklist-cat {
     background: var(--bg-3);
@@ -858,6 +903,18 @@
     <div class="card">
       <div class="card-title">Estrategia de compra · orden de visitas y ofertas</div>
       <div id="shoppingStrategy"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04E0 · PERFIL DEL COMPRADOR ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Vuestro perfil de comprador</h2>
+      <div class="section-tag">30 años · primera vivienda</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Análisis para joven primer comprador</div>
+      <div id="buyerProfile"></div>
     </div>
   </section>
 

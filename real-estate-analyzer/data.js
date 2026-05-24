@@ -68,6 +68,54 @@ window.REPORT_DATA = {
   // Asesoramiento profesional: timing, proyección, financiación, TCO
   expertView: {
 
+    // --- PERFIL DEL COMPRADOR ---
+    buyerProfile: {
+      age: 30,
+      firstHome: true,
+      family: 'Matrimonio + 2 niños + perro mediano',
+      horizonYears: 25,                // años previstos de tenencia
+      description: 'Comprador joven (30 años) en su primera vivienda. Capital propio €230k (venta vivienda anterior + bonus), horizonte largo, sin urgencia financiera.',
+      strengthsOfThisProfile: [
+        'Horizonte de tenencia largo → diluye riesgo de timing del ciclo',
+        'Edad permite plazos de hipoteca hasta 35-40 años (banca extiende hasta 70 años al cancelar)',
+        '€230k de capital = LTV 58% → perfil premium para banca, condiciones mejorables',
+        'Sin patrimonio inmobiliario previo → toda la atención y capital en este activo único'
+      ],
+      // Beneficios fiscales y de financiación específicos primer comprador <35
+      firstHomeBenefits: [
+        {
+          applies: false,
+          title: 'ITP reducido 3,5% Andalucía',
+          detail: 'NO APLICA: el ITP reducido para menores de 35 + primera vivienda está limitado a viviendas hasta €150.000. Espuela 59 (€465-480k) lo supera. El ITP queda en el 7% normal Andalucía 2026.',
+          impact: 0
+        },
+        {
+          applies: false,
+          title: 'Aval ICO 20% jóvenes <35',
+          detail: 'NO NECESARIO: el aval ICO está diseñado para compradores sin capital de entrada. Con vuestros €230k, el LTV se sitúa en 58% sin avales — perfil mejor que el que el aval intenta resolver.',
+          impact: 0
+        },
+        {
+          applies: 'maybe',
+          title: 'Bonificación TIN "joven primer comprador"',
+          detail: 'Algunos bancos ofrecen -0,05% a -0,10% adicional sobre TIN base si demuestras ser primer comprador menor de 35. Sondea explícitamente: ING, Openbank y Bankinter lo aplican.',
+          impact: 'hasta -€2.500 en intereses totales 30 años'
+        },
+        {
+          applies: 'maybe',
+          title: 'Deducción IRPF autonómica Andalucía',
+          detail: 'Vivienda habitual con renta familiar < €24.000/año: 2% deducción. Si vuestros ingresos lo permiten, verificar con asesor. Vivienda > €150k: deducción puede limitarse.',
+          impact: 'hasta €960/año si aplica'
+        },
+        {
+          applies: true,
+          title: 'Plazo de hipoteca extendido (hasta 40 años)',
+          detail: 'A los 30 años, la mayoría de bancos te financian hasta 40 años (límite normal: cancelación antes de 70 años → 30+40=70). Esto te permite plazo largo para cuota baja y libertad financiera.',
+          impact: 'Cuota -€259/mes vs 25 años'
+        }
+      ]
+    },
+
     // --- A. Contexto macro mayo 2026 ---
     macro: {
       reportDate: "mayo 2026",
@@ -165,53 +213,66 @@ window.REPORT_DATA = {
       scenarios: [
         {
           id: 'fija25',
-          name: 'Hipoteca FIJA 25 años (recomendada)',
+          name: 'Hipoteca FIJA 25 años',
           type: 'fija',
           tin: 2.85,
           tae: 3.10,
           years: 25,
-          vinculacion: 'Nomina + seguro hogar',
-          bonusOverBase: '-0,10% si domicilias nomina + seguro hogar',
-          recommended: true,
-          pros: ['Cuota fija e invariable 25 años', 'Inmunidad a subidas Euribor', 'Planificacion financiera estable'],
-          cons: ['No te beneficias si tipos bajan mas', 'Tipo nominal mas alto que variable inicial']
+          vinculacion: 'Nómina + seguro hogar',
+          ageFinish: 55,
+          pros: ['Hipoteca cancelada a los 55 años', 'Menos intereses totales (€107k)', 'Cuota manejable si renta consolidada'],
+          cons: ['Cuota más alta (€1.259/mes) reduce margen para ahorro/inversión', 'Menos flexibilidad si nacen más hijos o cambian circunstancias']
         },
         {
           id: 'fija30',
-          name: 'Hipoteca FIJA 30 años',
+          name: 'Hipoteca FIJA 30 años (RECOMENDADA para 30 años edad)',
           type: 'fija',
           tin: 2.85,
           tae: 3.10,
           years: 30,
-          vinculacion: 'Nomina + seguro hogar',
-          pros: ['Cuota mensual mas baja (~150€/mes menos)', 'Mayor capacidad de ahorro mensual'],
-          cons: ['Pagas ~25k€ mas en intereses totales', 'Hipoteca activa hasta los 65-70 años']
+          vinculacion: 'Nómina + seguro hogar',
+          ageFinish: 60,
+          recommended: true,
+          pros: ['Cuota baja (€1.117/mes) — €142/mes más para ahorrar/invertir', 'Hipoteca cancelada a los 60 años (5 años antes de jubilación)', 'Permite estrategia: cuota base baja + amortización anticipada con pagas extra'],
+          cons: ['€24k más en intereses totales vs 25 años', 'Si no amortizas anticipadamente, pagas más']
         },
         {
-          id: 'variable',
-          name: 'Hipoteca VARIABLE Euribor +0,55%',
-          type: 'variable',
-          tin: 2.85,                   // inicial
-          tae: 3.10,
-          years: 25,
-          diferencial: 0.55,
-          initialFixed: 1,             // primer año fijo
-          vinculacion: 'Nomina + seguro hogar + plan pensiones',
-          pros: ['Coste inicial similar a fija', 'Si Euribor baja al 1,5% en 2027-28, cuota baja'],
-          cons: ['Riesgo si Euribor sube al 3,5%+ (escenario inflacion)', 'Cuota variable cada año dificulta planning']
+          id: 'fija35',
+          name: 'Hipoteca FIJA 35 años',
+          type: 'fija',
+          tin: 2.95,                   // ligeramente más alto plazos largos
+          tae: 3.20,
+          years: 35,
+          vinculacion: 'Nómina + seguro hogar',
+          ageFinish: 65,
+          pros: ['Cuota mínima (~€1.030/mes) → máximo margen mensual', 'Permite máximo ahorro/inversión paralelo a la hipoteca'],
+          cons: ['€55k más en intereses totales vs 25 años', 'Hipoteca activa hasta los 65 años', 'TIN ligeramente superior (riesgo plazo)']
         },
         {
-          id: 'mixta',
-          name: 'Hipoteca MIXTA 5 años fija + Euribor+0,60%',
+          id: 'fija40',
+          name: 'Hipoteca FIJA 40 años (límite máximo)',
+          type: 'fija',
+          tin: 3.10,
+          tae: 3.35,
+          years: 40,
+          vinculacion: 'Nómina + seguro hogar + plan pensiones',
+          ageFinish: 70,
+          pros: ['Cuota mínima absoluta (~€965/mes)', 'Posible solo por edad joven (30) — ventana única'],
+          cons: ['€87k más en intereses totales vs 25 años', 'Pocos bancos lo ofrecen (ING, Openbank en algunos casos)', 'Hipoteca te acompaña hasta los 70 años — fin de la vida laboral']
+        },
+        {
+          id: 'mixta30',
+          name: 'Hipoteca MIXTA 5y fija + Euribor (a 30 años)',
           type: 'mixta',
           tinInitial: 2.50,            // primeros 5 años
-          tinAfter: 2.90,              // estimado (Eur+0,60 a Euribor proyectado 2,30%)
+          tinAfter: 2.90,              // estimado
           tae: 2.85,
-          years: 25,
+          years: 30,
           fixedYears: 5,
-          vinculacion: 'Nomina + seguro hogar',
-          pros: ['Cuota baja primeros 5 años (los criticos)', 'Equity build-up rapido al inicio'],
-          cons: ['Incertidumbre tras 5 años', 'Riesgo concentrado en fechas Euribor revision']
+          vinculacion: 'Nómina + seguro hogar',
+          ageFinish: 60,
+          pros: ['Cuota baja primeros 5 años críticos (niños pequeños)', 'Si tipos bajan en 2030, te beneficias', 'Tiempo para amortizar antes de la variable'],
+          cons: ['Incertidumbre tras año 5 (cuota subiría hasta ~€1.150/mes con Euribor base)', 'Requiere disciplina para amortizar capital antes del cambio']
         }
       ]
     },

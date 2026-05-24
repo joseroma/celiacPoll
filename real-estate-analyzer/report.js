@@ -613,6 +613,49 @@
   // ============================================================
   const ev = D.expertView;
   if (ev) {
+    // ---------- 13.0 Perfil del comprador (joven primer comprador) ----------
+    const bp = ev.buyerProfile;
+    const buyerEl = document.getElementById('buyerProfile');
+    if (buyerEl && bp) {
+      const benefitIcon = (a) => a === true ? '<span style="color:var(--green)">✓</span>' : a === false ? '<span style="color:var(--red)">✗</span>' : '<span style="color:var(--gold-2)">~</span>';
+      const benefitLabel = (a) => a === true ? 'SÍ APLICA' : a === false ? 'NO APLICA' : 'POR VERIFICAR';
+      const benefitColor = (a) => a === true ? 'var(--green)' : a === false ? 'var(--red)' : 'var(--gold-2)';
+
+      buyerEl.innerHTML = `
+        <div class="card-narrative">
+          <p style="margin:0 0 14px;font-size:13.5px;line-height:1.65"><strong>${bp.description}</strong></p>
+        </div>
+
+        <h4 style="margin:8px 0 10px;color:var(--gold-2);font-size:13px">💪 Fortalezas de vuestro perfil</h4>
+        <ul style="padding-left:20px;line-height:1.7;font-size:13px;color:var(--text-dim);margin:0 0 14px">
+          ${bp.strengthsOfThisProfile.map(s => `<li style="margin-bottom:4px"><span style="color:var(--text)">${s}</span></li>`).join('')}
+        </ul>
+
+        <h4 style="margin:14px 0 8px;color:var(--gold-2);font-size:13px">🎯 Beneficios fiscales y de financiación (primera vivienda + &lt;35 años)</h4>
+        <div class="benefits-grid">
+          ${bp.firstHomeBenefits.map(b => `
+            <div class="benefit-card" style="border-left:3px solid ${benefitColor(b.applies)}">
+              <div class="benefit-head">
+                <div>
+                  <div class="benefit-title">${benefitIcon(b.applies)} ${b.title}</div>
+                  <div class="benefit-tag" style="color:${benefitColor(b.applies)}">${benefitLabel(b.applies)}</div>
+                </div>
+              </div>
+              <div class="benefit-detail">${b.detail}</div>
+              ${b.impact ? `<div class="benefit-impact">📊 Impacto: <strong>${b.impact}</strong></div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="card" style="margin-top:14px;background:rgba(46,160,67,0.06);border-color:rgba(46,160,67,0.25)">
+          <p style="margin:0;font-size:13px;line-height:1.65">
+            <strong style="color:var(--green)">📌 Mensaje clave del experto.</strong>
+            A los 30 años, vuestra <strong>mejor herramienta financiera es el TIEMPO</strong>, no las ayudas fiscales (que en vuestro caso aplican poco por el precio del inmueble). Aprovechad el tiempo: plazo largo de hipoteca (30 años) + amortización anticipada con pagas extra + inversión paralela del margen mensual. Es la estrategia clásica del comprador joven con capital.
+          </p>
+        </div>
+      `;
+    }
+
     // ---------- 13.1 Timing macro ----------
     const macroEl = document.getElementById('macroAnalysis');
     if (macroEl) {
@@ -832,37 +875,46 @@
       // Recomendación experta
       const recScen = scenarios.find(s => s.recommended);
       const recCalc = mortgageCalc(principal, recScen.tin, recScen.years);
+      const calc25 = mortgageCalc(principal, 2.85, 25);
+      const calc35 = mortgageCalc(principal, 2.95, 35);
+      const buyerAge = ev.buyerProfile && ev.buyerProfile.age || 30;
       const recEl = document.getElementById('mortgageRecommendation');
       if (recEl) {
         recEl.innerHTML = `
           <div class="winner-banner">
-            <div class="winner-label">RECOMENDACIÓN DEL EXPERTO</div>
+            <div class="winner-label">RECOMENDACIÓN DEL EXPERTO · ADAPTADA A EDAD ${buyerAge}</div>
             <div class="winner-title">${recScen.name}</div>
             <div style="font-size:28px;font-weight:800;color:var(--green);margin:8px 0">${eur(recCalc.monthly, 0)} <span style="font-size:14px;color:var(--text-dim);font-weight:500">/ mes</span></div>
-            <div class="winner-score">${eur(principal)} a ${recScen.tin}% TIN durante ${recScen.years} años</div>
+            <div class="winner-score">${eur(principal)} a ${recScen.tin}% TIN durante ${recScen.years} años · acabas la hipoteca a los ${buyerAge + recScen.years} años</div>
           </div>
           <div class="card-narrative" style="margin-top:14px">
-            <p><strong>¿Por qué fija a 25 años?</strong></p>
+            <p><strong>¿Por qué FIJA a 30 años a tu edad?</strong></p>
             <ul style="padding-left:20px;line-height:1.7">
-              <li><strong>Estabilidad familiar.</strong> Con 2 niños y horizonte largo, una cuota fija da paz mental y permite planificar gastos (colegios, extraescolares, viajes) sin sorpresas si los tipos suben.</li>
-              <li><strong>Tipos cerca del suelo estructural.</strong> El BCE ya bajó 225 puntos básicos desde 2023. La probabilidad de que bajen mucho más es limitada (BCE objetivo neutro ~2,25-2,50%). Fija ahora = capturar tipo competitivo.</li>
-              <li><strong>25 años es el sweet spot.</strong> Cuota manejable (≤30% renta neta familiar tipo), intereses razonables, hipoteca cancelada antes de los 60 años. Liberación financiera anticipada.</li>
-              <li><strong>Amortizacion anticipada.</strong> Negocia que NO haya comisión por amortización anticipada (legal: máximo 2% primeros 10 años, 1.5% después). Esto te permite cancelar capital con futuras pagas extra/bonus.</li>
+              <li><strong>Flexibilidad mensual = oxígeno financiero.</strong> A 30 años pagas <strong>€${Math.round(calc25.monthly - recCalc.monthly)}/mes menos</strong> que a 25 años. Esos €142/mes son €1.700/año que puedes destinar a: fondo emergencia (3-6 meses gastos), cuenta hijos (estudios, actividades), inversión a largo plazo. A tu edad, ese capital invertido a 5% real produce ${eur(142 * 12 * 30, 0)} en 30 años — más que el sobrecoste de intereses.</li>
+              <li><strong>Acabas la hipoteca a los 60 años, 5 antes de jubilarte.</strong> Llegas a la jubilación con vivienda en propiedad pagada y sin cuotas. Margen suficiente.</li>
+              <li><strong>Estrategia óptima: 30 años + amortización anticipada.</strong> Pide al banco <strong>cero comisión por amortización anticipada</strong> (legal: máx. 2% primeros 10 años, suele negociarse a 0%). Cada paga extra y bonus puedes destinarlos a reducir capital. Resultado: pagas como si fuera a 25-26 años pero con flexibilidad de 30.</li>
+              <li><strong>Tipo todavía competitivo.</strong> BCE bajó del 4,50% al 2,25% desde 2023. La probabilidad de que bajen mucho más es limitada (BCE objetivo neutro ~2,25-2,50%). Fija ahora = capturar tipo histórico bueno.</li>
             </ul>
-            <p><strong>Bancos a sondear (con TINs base mayo 2026):</strong></p>
+            <p style="margin-top:14px"><strong>¿Y por qué no 35 años (cuota €${Math.round(calc35.monthly)}/mes)?</strong></p>
+            <p style="font-size:13px;color:var(--text-dim);line-height:1.6">
+              A los 30 años podríais pedirla, pero <strong>el TIN sube ~0,10% por el riesgo del plazo</strong> y los intereses totales suman <strong>€${Math.round(calc35.interest - recCalc.interest).toLocaleString('es-ES')} más</strong>. La diferencia en cuota mensual es solo €${Math.round(recCalc.monthly - calc35.monthly)}/mes, no compensa.
+              <strong>30 años es el sweet spot</strong> entre flexibilidad mensual y coste total.
+            </p>
+            <p style="margin-top:14px"><strong>Bancos a sondear (TINs base mayo 2026, perfil joven primer comprador, plazo 30 años):</strong></p>
             <ul style="padding-left:20px;line-height:1.7;color:var(--text-dim)">
-              <li><strong>ING Hipoteca Naranja Fija:</strong> 2.69% TIN (con domiciliación nómina). El benchmark del mercado.</li>
-              <li><strong>Openbank:</strong> 2.79% TIN. Sin vinculación obligatoria estricta.</li>
-              <li><strong>EVO Banco:</strong> 2.85% TIN. Bonificable hasta 2.65% con seguros.</li>
-              <li><strong>Bankinter:</strong> 3.10% TIN sin vinculación / 2.75% con vinculación fuerte.</li>
-              <li><strong>BBVA / Santander / CaixaBank:</strong> 2.95-3.25% TIN con vinculación. Negociables.</li>
+              <li><strong>ING Hipoteca Naranja Fija:</strong> 2.69% TIN base + nómina. Pide explícitamente la <strong>bonificación "joven primer comprador"</strong> (algunos perfiles consiguen 2.55-2.60%).</li>
+              <li><strong>Openbank:</strong> 2.79% TIN. Producto "Casa joven" sin vinculación estricta.</li>
+              <li><strong>EVO Banco:</strong> 2.85% TIN base. Bonificable hasta 2.65% con seguros del banco.</li>
+              <li><strong>Bankinter:</strong> 2.75-3.10% TIN con vinculación. Buen aliado si traes nómina y plan pensiones.</li>
+              <li><strong>BBVA / Santander / CaixaBank:</strong> 2.95-3.25% TIN con vinculación. Tu banco actual: pide que iguale o mejore las anteriores.</li>
             </ul>
-            <p style="margin-top:10px"><strong>Pasos concretos esta semana:</strong></p>
+            <p style="margin-top:14px"><strong>Pasos concretos esta semana:</strong></p>
             <ol style="padding-left:20px;line-height:1.7">
-              <li>Solicitar <strong>3 ofertas vinculantes</strong> (FEIN) a ING + Openbank + tu banco actual.</li>
-              <li>Pedir explícitamente: cero comisión apertura, cero compensación amortización anticipada, vinculación máxima 2 productos.</li>
+              <li>Solicitar <strong>3 ofertas vinculantes</strong> (FEIN) a ING + Openbank + tu banco actual. Especifica: <em>plazo 30 años, primera vivienda, comprador 30 años</em>.</li>
+              <li>Negociar explícitamente: <strong>cero comisión apertura</strong>, <strong>cero compensación por amortización anticipada</strong>, <strong>vinculación máxima 2 productos</strong> (nómina + seguro hogar, nada más).</li>
               <li>Con la mejor oferta en mano, ir a tu banco actual y pedir que iguale o mejore.</li>
-              <li>Tasación: NO pagar la del banco hasta tener oferta vinculante FEIN. Para hacer ofertas previas, una tasación tuya independiente (~€350) basta.</li>
+              <li>Tasación: NO pagar la del banco hasta tener FEIN. Para ofertas previas, una tasación tuya independiente (~€350) basta.</li>
+              <li><strong>OJO con la edad del cónyuge.</strong> Si vuestra hipoteca es a 2 titulares, el banco suele exigir que el plazo + edad del mayor no supere 70-75 años. Si tu cónyuge tiene también ~30, no hay problema.</li>
             </ol>
           </div>
         `;
