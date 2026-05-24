@@ -1,0 +1,16 @@
+{
+  "name": "idealista-scraper",
+  "version": "1.0.0",
+  "description": "Extractor de anuncios de Idealista para Real Estate Analyzer",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "install-browsers": "playwright install chromium firefox",
+    "scrape": "node scrape.js"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

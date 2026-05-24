@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0">
+<meta name="theme-color" content="#0b1320">
+<title>Análisis · Retamar (Almería) · idealista/111008988</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #0b1320;
+    --bg-2: #131c2e;
+    --bg-3: #1a2540;
+    --line: #25334d;
+    --text: #e8ecf3;
+    --text-dim: #9aa6bd;
+    --text-mute: #6b7791;
+    --gold: #d4af37;
+    --gold-2: #f0c75a;
+    --green: #3ddc97;
+    --red: #ff6b6b;
+    --amber: #ffb347;
+    --blue: #5aa9ff;
+    --radius: 14px;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(212,175,55,0.07) 0%, transparent 40%),
+      radial-gradient(ellipse at bottom right, rgba(90,169,255,0.05) 0%, transparent 50%),
+      var(--bg);
+    min-height: 100vh;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding: 0 18px 80px; }
+
+  /* ---------- HEADER ---------- */
+  header.top {
+    padding: 22px 18px 14px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(212,175,55,0.06), transparent);
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(12px);
+    background-color: rgba(11,19,32,0.85);
+  }
+  .top-inner { max-width: 720px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
+    display:flex; align-items:center; justify-content:center;
+    color: #1a1408; font-weight: 800; font-size: 14px;
+  }
+  .brand-text { font-weight: 700; font-size: 14px; letter-spacing: 0.3px; }
+  .brand-sub { font-size: 11px; color: var(--text-mute); font-weight: 500; }
+  .top-ref a { color: var(--text-dim); font-size: 11px; text-decoration: none; font-family: 'JetBrains Mono', monospace; }
+  .top-ref a:hover { color: var(--gold); }
+
+  /* ---------- HERO ---------- */
+  .hero { padding: 28px 0 8px; }
+  .badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background: rgba(212,175,55,0.12);
+    color: var(--gold-2);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 5px 10px; border-radius: 999px;
+    border: 1px solid rgba(212,175,55,0.25);
+  }
+  h1 {
+    font-size: 28px; line-height: 1.15; margin: 14px 0 8px;
+    font-weight: 800; letter-spacing: -0.5px;
+  }
+  h1 .accent { color: var(--gold); }
+  .hero-sub { color: var(--text-dim); font-size: 14px; margin-bottom: 18px; }
+
+  /* ---------- WARNING (datos asumidos) ---------- */
+  .warning {
+    background: rgba(255, 179, 71, 0.08);
+    border: 1px solid rgba(255, 179, 71, 0.3);
+    border-left: 3px solid var(--amber);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin: 12px 0 20px;
+    color: #f5d9a8;
+  }
+  .warning strong { color: var(--amber); }
+
+  /* ---------- VERDICT CARD ---------- */
+  .verdict {
+    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-3) 100%);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 18px;
+    margin: 18px 0 24px;
+    position: relative; overflow: hidden;
+  }
+  .verdict::before {
+    content:""; position:absolute; top:0; left:0; right:0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-2));
+  }
+  .verdict-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mute); margin-bottom: 8px; font-weight: 600; }
+  .verdict-badge {
+    display:inline-block;
+    font-size: 13px; font-weight: 700;
+    padding: 6px 14px; border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .v-hold { background: rgba(255,179,71,0.15); color: var(--amber); border:1px solid rgba(255,179,71,0.3); }
+  .v-buy  { background: rgba(61,220,151,0.15); color: var(--green);  border:1px solid rgba(61,220,151,0.3); }
+  .v-pass { background: rgba(255,107,107,0.15); color: var(--red);   border:1px solid rgba(255,107,107,0.3); }
+  .verdict h2 { font-size: 20px; margin: 4px 0 10px; font-weight: 700; }
+  .verdict p { color: var(--text-dim); font-size: 14px; margin: 0; }
+  .verdict-kpis {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line);
+  }
+  .kpi { }
+  .kpi-label { font-size: 11px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-value { font-size: 19px; font-weight: 700; color: var(--text); font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+  .kpi-value.gold { color: var(--gold-2); }
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.red { color: var(--red); }
+  .kpi-sub { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+
+  /* ---------- SECTION ---------- */
+  section { margin: 28px 0; }
+  .section-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 12px; gap: 8px; }
+  h2.section-title {
+    font-size: 18px; font-weight: 700; margin: 0;
+    display:flex; align-items:center; gap: 10px;
+  }
+  h2.section-title .num {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gold);
+    font-size: 13px;
+    background: rgba(212,175,55,0.1);
+    border: 1px solid rgba(212,175,55,0.25);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .section-tag { font-size: 11px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ---------- CARD ---------- */
+  .card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .card-title { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; font-weight: 600; }
+
+  /* ---------- DATA GRID ---------- */
+  .datagrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+  }
+  .dg-item { padding: 8px 0; border-bottom: 1px dashed var(--line); }
+  .dg-item:nth-last-child(-n+2) { border-bottom: 0; }
+  .dg-k { font-size: 11px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.5px; }
+  .dg-v { font-size: 14px; color: var(--text); font-weight: 600; margin-top: 2px; }
+
+  /* ---------- CHART ---------- */
+  .chart-wrap { position: relative; height: 280px; margin: 8px -4px 0; }
+  .chart-legend {
+    display:flex; flex-wrap:wrap; gap:10px 14px;
+    margin-top: 10px; font-size: 12px; color: var(--text-dim);
+  }
+  .leg-dot { display:inline-block; width:10px; height:10px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+
+  /* ---------- TABLE ---------- */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table.t {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    min-width: 320px;
+  }
+  table.t th, table.t td { padding: 9px 8px; text-align: right; border-bottom: 1px solid var(--line); }
+  table.t th:first-child, table.t td:first-child { text-align: left; }
+  table.t th {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-mute); font-weight: 600;
+  }
+  table.t td.num { font-family: 'JetBrains Mono', monospace; }
+  table.t tr.hl td { background: rgba(212,175,55,0.06); }
+  table.t tr.hl td:first-child { color: var(--gold-2); font-weight: 700; }
+
+  /* ---------- NEGOTIATION BREAKDOWN ---------- */
+  .neg-line {
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 11px 0; border-bottom: 1px dashed var(--line);
+    font-size: 14px;
+  }
+  .neg-line:last-child { border-bottom: 0; }
+  .neg-label { color: var(--text-dim); font-size: 13px; flex: 1; padding-right: 8px; }
+  .neg-amount { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+  .neg-amount.neg { color: var(--red); }
+  .neg-amount.pos { color: var(--green); }
+  .neg-line.total { padding-top: 14px; margin-top: 6px; border-top: 1px solid var(--line); border-bottom: 0; }
+  .neg-line.total .neg-label { color: var(--text); font-weight: 700; font-size: 14px; }
+  .neg-line.total .neg-amount { color: var(--gold-2); font-size: 17px; font-weight: 700; }
+
+  /* ---------- RISK MATRIX ---------- */
+  .risk-item { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .risk-item:last-child { border-bottom: 0; }
+  .risk-head { display:flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .risk-name { font-size: 14px; font-weight: 600; flex: 1; }
+  .risk-score {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px;
+    padding: 3px 8px; border-radius: 5px; flex-shrink: 0;
+  }
+  .rs-low { background: rgba(61,220,151,0.12); color: var(--green); }
+  .rs-med { background: rgba(255,179,71,0.12); color: var(--amber); }
+  .rs-high { background: rgba(255,107,107,0.15); color: var(--red); }
+  .risk-bar { height: 4px; background: var(--bg-3); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .risk-bar-fill { height: 100%; border-radius: 2px; }
+  .risk-note { font-size: 12px; color: var(--text-mute); line-height: 1.5; }
+
+  /* ---------- COMPARABLES ---------- */
+  .comp-item {
+    padding: 12px; border: 1px solid var(--line);
+    border-radius: 10px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.015);
+  }
+  .comp-head { display:flex; justify-content:space-between; gap: 10px; margin-bottom: 6px; }
+  .comp-ref { font-size: 13px; color: var(--text); font-weight: 500; flex: 1; }
+  .comp-price { font-family: 'JetBrains Mono', monospace; color: var(--gold-2); font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .comp-meta { display:flex; flex-wrap: wrap; gap: 10px; font-size: 11px; color: var(--text-mute); margin-top: 4px; }
+  .comp-meta span { display:inline-flex; align-items:center; }
+  .comp-meta strong { color: var(--text-dim); font-weight: 600; margin-left: 4px; }
+  .comp-meta a { color: var(--blue); text-decoration: none; font-size: 11px; }
+
+  /* ---------- ROI ---------- */
+  .roi-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .roi-card { background: var(--bg-3); padding: 14px 12px; border-radius: 10px; border:1px solid var(--line); }
+  .roi-card .lbl { font-size: 10px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.5px; }
+  .roi-card .val { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; margin: 4px 0; }
+  .roi-card .pct { font-size: 11px; color: var(--text-mute); }
+  .roi-card .val.green { color: var(--green); }
+  .roi-card .val.gold { color: var(--gold-2); }
+
+  /* ---------- ACCORDION ---------- */
+  details { background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }
+  details summary {
+    padding: 12px 14px; cursor: pointer; font-size: 13px;
+    list-style: none; display:flex; justify-content:space-between; align-items:center;
+    font-weight: 600;
+  }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content: "+"; color: var(--gold); font-size: 18px; font-weight: 700; }
+  details[open] summary::after { content: "−"; }
+  details > div { padding: 0 14px 14px; font-size: 13px; color: var(--text-dim); }
+
+  /* ---------- ACTION CTA ---------- */
+  .cta {
+    display:flex; gap: 10px; flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .cta a {
+    flex: 1; min-width: 130px;
+    background: var(--gold);
+    color: #1a1408;
+    text-decoration: none;
+    font-weight: 700;
+    text-align: center;
+    padding: 13px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+  .cta a.secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--line);
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--text-mute);
+    line-height: 1.6;
+  }
+  footer .src { display:flex; flex-wrap:wrap; gap: 6px 12px; margin-top: 10px; }
+  footer .src a { color: var(--text-dim); text-decoration: none; }
+  footer .src a:hover { color: var(--gold); }
+  .disclaimer { font-size: 10px; color: var(--text-mute); margin-top: 14px; line-height: 1.6; }
+
+  /* ---------- TABS ---------- */
+  .tabs { display:flex; gap: 4px; background: var(--bg-3); padding: 4px; border-radius: 8px; margin-bottom: 14px; }
+  .tab {
+    flex: 1; padding: 8px 6px; text-align: center;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    border-radius: 6px; color: var(--text-mute);
+    transition: all 0.15s;
+  }
+  .tab.active { background: var(--bg); color: var(--gold-2); }
+
+  /* ---------- DESKTOP ---------- */
+  @media (min-width: 720px) {
+    body { font-size: 16px; }
+    h1 { font-size: 36px; }
+    .chart-wrap { height: 340px; }
+    .verdict-kpis { grid-template-columns: repeat(4, 1fr); }
+    .datagrid { grid-template-columns: repeat(3, 1fr); }
+    .datagrid .dg-item:nth-last-child(-n+2) { border-bottom: 1px dashed var(--line); }
+    .datagrid .dg-item:nth-last-child(-n+3) { border-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="brand-mark">RA</div>
+      <div>
+        <div class="brand-text">Real Estate Analyzer</div>
+        <div class="brand-sub">Informe inversor · v1.0</div>
+      </div>
+    </div>
+    <div class="top-ref">
+      <a id="topRef" href="#" target="_blank" rel="noopener">↗ idealista</a>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ========== HERO ========== -->
+  <div class="hero">
+    <span class="badge">★ Análisis profesional</span>
+    <h1>Villa en <span class="accent">Retamar</span>,<br>Almería</h1>
+    <div class="hero-sub" id="heroSub">Informe del <span id="reportDate"></span> · Comparativa frente a Almería capital, Almerimar, El Ejido y San José (Cabo de Gata).</div>
+
+    <div id="estimatedWarning" class="warning" style="display:none">
+      <strong>⚠ Datos del inmueble estimados.</strong>
+      No se ha podido extraer el anuncio (Idealista bloquea scraping con DataDome desde IPs cloud). Los m², habitaciones y precio mostrados son <em>plausibles</em> para una villa reformada en Retamar. <strong>Edita <code>data.js</code></strong> con los valores reales del anuncio o ejecuta <code>scraper/run.sh</code> en tu equipo local para recalcular todo el informe.
+    </div>
+  </div>
+
+  <!-- ========== VERDICT ========== -->
+  <div class="verdict">
+    <div class="verdict-label">Veredicto · 1 minuto</div>
+    <div id="verdictBadge" class="verdict-badge v-hold">NEGOCIAR — Margen objetivo claro</div>
+    <h2 id="verdictHeadline">Precio razonable pero con recorrido a la baja</h2>
+    <p id="verdictText"></p>
+
+    <div class="verdict-kpis">
+      <div class="kpi">
+        <div class="kpi-label">Pide</div>
+        <div class="kpi-value gold" id="kpiAsk"></div>
+        <div class="kpi-sub" id="kpiAskPerM2"></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Valor estimado</div>
+        <div class="kpi-value" id="kpiFair"></div>
+        <div class="kpi-sub" id="kpiFairPerM2"></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Oferta inicial</div>
+        <div class="kpi-value green" id="kpiOffer"></div>
+        <div class="kpi-sub">Empezar negociación</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Walk-away</div>
+        <div class="kpi-value red" id="kpiWalk"></div>
+        <div class="kpi-sub">Precio máximo a pagar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== § 01 PROPIEDAD ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">01</span> El inmueble</h2>
+    </div>
+    <div class="card">
+      <div class="datagrid" id="propGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 02 HISTÓRICO 30 AÑOS ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">02</span> Precio €/m² · 30 años</h2>
+      <div class="section-tag">1995 → 2026</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Evolución comparada · €/m² nominal</div>
+      <div class="tabs" id="histTabs">
+        <div class="tab active" data-mode="abs">Absoluto €</div>
+        <div class="tab" data-mode="idx">Índice base 100</div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartHistory"></canvas></div>
+      <div class="chart-legend" id="histLegend"></div>
+    </div>
+    <details>
+      <summary>📖 Cómo leer este gráfico</summary>
+      <div>
+        <p>El gráfico muestra la evolución del precio del metro cuadrado de vivienda usada en cada zona desde 1995. Se aprecian con claridad tres ciclos:</p>
+        <p><strong>1) Burbuja 1998-2007:</strong> precios x3 en costa almeriense. Almerimar y San José fueron las zonas más infladas (orientadas a inversión y segunda residencia).</p>
+        <p><strong>2) Corrección 2008-2014:</strong> caídas del 40-45% en zonas costeras, 38-40% en interior. Almería capital aguantó algo mejor por demanda residencial.</p>
+        <p><strong>3) Recuperación 2015-2026:</strong> ciclo alcista sostenido. Retamar y Almerimar ya han recuperado máximos del 2007 en términos nominales; San José aún por debajo (regulación Cabo de Gata limita oferta y demanda turística).</p>
+        <p>El cambio de base 100 en 1995 ayuda a ver qué zona ha sido <em>mejor inversión a largo plazo</em>: el dinero invertido en El Ejido se multiplica por menos que en Retamar.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ========== § 03 BENCHMARK ACTUAL ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">03</span> Benchmark €/m² hoy</h2>
+      <div class="section-tag">mayo 2026</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Comparativa por zonas</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="chartBenchmark"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Tabla resumen</div>
+      <div class="table-wrap">
+        <table class="t" id="tBenchmark">
+          <thead><tr><th>Zona</th><th>€/m²</th><th>Δ 5 años</th><th>Δ 30 años</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== § 04 NEGOCIACIÓN ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">04</span> Margen de negociación</h2>
+      <div class="section-tag">Construcción objetiva</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Desde el precio pedido hasta el valor objetivo</div>
+      <div id="negBreakdown"></div>
+    </div>
+    <details>
+      <summary>🎯 Estrategia de negociación recomendada</summary>
+      <div id="negStrategy"></div>
+    </details>
+  </section>
+
+  <!-- ========== § 05 COMPARABLES ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">05</span> Comparables activos</h2>
+      <div class="section-tag">Retamar · Idealista</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Inmuebles similares ahora mismo en el mercado</div>
+      <div id="compList"></div>
+      <div class="chart-wrap" style="height:230px; margin-top:8px"><canvas id="chartComp"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ========== § 06 ROI ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">06</span> Análisis de inversión</h2>
+      <div class="section-tag">ROI &amp; plusvalía</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Escenario A · alquiler larga estancia</div>
+      <div class="roi-grid">
+        <div class="roi-card"><div class="lbl">Renta bruta/mes</div><div class="val gold" id="rentLT"></div><div class="pct" id="rentLTpct"></div></div>
+        <div class="roi-card"><div class="lbl">Yield neto anual</div><div class="val green" id="yieldLT"></div><div class="pct">tras gastos+vacíos</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Escenario B · alquiler turístico vacacional</div>
+      <div class="roi-grid">
+        <div class="roi-card"><div class="lbl">Ingresos brutos/año</div><div class="val gold" id="rentVT"></div><div class="pct" id="rentVTpct"></div></div>
+        <div class="roi-card"><div class="lbl">Yield neto anual</div><div class="val green" id="yieldVT"></div><div class="pct">55% ocupación · 25% gestión</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Plusvalía proyectada a 10 años</div>
+      <div class="chart-wrap" style="height:230px"><canvas id="chartProj"></canvas></div>
+      <div id="projText" style="font-size:12px;color:var(--text-dim);margin-top:8px;line-height:1.6"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 07 RIESGOS ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">07</span> Riesgos</h2>
+      <div class="section-tag">Matriz cualitativa 0-10</div>
+    </div>
+    <div class="card">
+      <div id="riskList"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 08 CHECKLIST DE COMPRA ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">08</span> Checklist due diligence</h2>
+    </div>
+    <div class="card">
+      <details open>
+        <summary>📋 Antes de hacer oferta</summary>
+        <div>
+          <ul style="margin:6px 0 0 18px; padding:0; color:var(--text-dim); font-size:13px; line-height:1.8">
+            <li>Solicitar <strong>nota simple</strong> al Registro de la Propiedad (≈10€): cargas, hipoteca, embargos, servidumbres.</li>
+            <li>Pedir <strong>certificado de eficiencia energética</strong> y certificado de habitabilidad.</li>
+            <li>Comprobar <strong>IBI último recibo</strong> y estado pagos comunidad (acta de la última junta).</li>
+            <li>Verificar <strong>licencia de obra y final de obra</strong> en el Ayuntamiento de Almería.</li>
+            <li>Comprobar superficie real frente a catastro y nota simple (frecuente: discrepancias 5-10% en chalets).</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>🏗️ Inspección técnica</summary>
+        <div>
+          <ul style="margin:6px 0 0 18px; padding:0; color:var(--text-dim); font-size:13px; line-height:1.8">
+            <li>Contratar <strong>ITE/peritaje</strong> independiente (300-500€): humedades, cubierta, instalación eléctrica, aluminosis.</li>
+            <li>Test de presión piscina y revisar depuradora/bomba.</li>
+            <li>Estado del aislamiento (cubierta y muros) — Retamar tiene mucha villa de 2005-2010 con aislamiento mejorable.</li>
+            <li>Revisar instalación de aire acondicionado (esencial en Almería) y caldera/termo eléctrico.</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>📜 Riesgos legales específicos Almería costa</summary>
+        <div>
+          <ul style="margin:6px 0 0 18px; padding:0; color:var(--text-dim); font-size:13px; line-height:1.8">
+            <li><strong>Ley de Costas:</strong> verificar deslinde costas vigente (Demarcación de Costas en Andalucía Oriental). Servidumbre de protección 100m.</li>
+            <li><strong>Inundabilidad:</strong> consultar Sistema Nacional Cartografía Zonas Inundables (CNIG). Retamar Sur está parcialmente en zona T-500.</li>
+            <li><strong>Vivienda turística (VFT):</strong> registro andaluz obligatorio si vas a explotar vacacional. Comprobar que la comunidad no la prohíba en estatutos.</li>
+            <li><strong>Plusvalía municipal:</strong> calcular según nueva fórmula (sentencia TC 2021) antes de cerrar precio.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ========== § 09 RECURSOS Y SCRAPER ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">09</span> Cómo actualizar este informe</h2>
+    </div>
+    <div class="card">
+      <div class="card-title">Edición rápida</div>
+      <p style="font-size:13px; color:var(--text-dim); margin: 0 0 10px;">
+        Todos los datos del inmueble están en <code>data.js</code> dentro del objeto <code>property</code>.
+        Cambia los valores y refresca esta página: el informe entero se recalcula automáticamente.
+      </p>
+      <div class="cta">
+        <a href="data.js">📄 Editar data.js</a>
+        <a class="secondary" id="ctaIdealista" target="_blank" rel="noopener">🔗 Abrir anuncio</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Scraper automático (local)</div>
+      <p style="font-size:13px; color:var(--text-dim); margin: 0 0 8px;">
+        Idealista bloquea scraping desde IPs de cloud, pero <strong>desde tu casa funciona</strong>. En la carpeta <code>scraper/</code> tienes un script Playwright que extrae automáticamente los datos del anuncio:
+      </p>
+      <pre style="background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:11px; overflow-x:auto; color: var(--text-dim);">cd scraper
+npm install
+node scrape.js https://www.idealista.com/inmueble/111008988/</pre>
+      <p style="font-size:12px; color:var(--text-mute); margin: 8px 0 0;">Genera <code>property.json</code> que puedes pegar en <code>data.js</code>.</p>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer>
+    <div><strong style="color:var(--text-dim)">Metodología.</strong> Series €/m² construidas con datos públicos de Idealista (informes 2007-2026), Fotocasa (índice precio vivienda), Tinsa IMIE (base 2001=1000), INE (índice precio vivienda 2007+) y Ministerio de Vivienda (precio tasado 1995-2007). Datos pre-2007 son interpolación regional ajustada por provincia (la costa almeriense amplificó el ciclo nacional ~+15-20%).</div>
+    <div style="margin-top:10px"><strong style="color:var(--text-dim)">Fuentes.</strong></div>
+    <div class="src" id="sourcesList"></div>
+    <div class="disclaimer">
+      Este informe es una herramienta de análisis para uso personal del comprador y NO constituye asesoramiento financiero, fiscal ni legal. Las proyecciones de precio se basan en tendencias históricas y NO garantizan resultados futuros. Los datos del inmueble pueden contener estimaciones — verifica siempre la información directamente con el anunciante y un perito independiente antes de cualquier oferta vinculante.
+    </div>
+  </footer>
+
+</div>
+
+<script src="data.js"></script>
+<script src="report.js"></script>
+</body>
+</html>
