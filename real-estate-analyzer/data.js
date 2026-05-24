@@ -7,37 +7,61 @@
 
 window.REPORT_DATA = {
 
-  // ---------- INMUEBLE (editable) ----------
+  // ---------- INMUEBLE (datos confirmados desde el anuncio) ----------
   property: {
     ref: "idealista.com/inmueble/111008988",
     url: "https://www.idealista.com/inmueble/111008988/",
     zone: "Retamar",
     municipality: "Almeria",
-    type: "Chalet independiente / Villa",
-    state: "Buen estado / reformado",
+    address: "Camino de la Espuela, 59, Retamar",
+    type: "Casa o chalet independiente",
+    state: "Segunda mano / buen estado",
 
-    // ---- VALORES ESTIMADOS (asuncion) ----
-    // El scraper no ha podido extraer el anuncio por proteccion anti-bot
-    // de Idealista (DataDome). Reemplaza con los datos reales y el informe
-    // recalcula automaticamente.
-    askingPrice: 645000,        // EUR — precio que pide el vendedor (PLACEHOLDER)
-    builtArea: 220,             // m2 construidos
-    usableArea: 195,            // m2 utiles
-    plotArea: 420,              // m2 parcela
-    bedrooms: 4,
-    bathrooms: 3,
-    yearBuilt: 2008,
-    floor: "Planta baja + 1",
-    parking: true,
-    pool: true,
-    terrace: true,
-    storage: true,
-    energyCert: "D",
-    distanceBeachM: 450,        // metros andando hasta playa
-    communityFeesMonth: 65,     // EUR/mes (urbanizacion)
-    ibiYear: 720,               // EUR/anyo aproximado
+    askingPrice: 480000,        // confirmado anuncio
+    builtArea: 185,             // m2 construidos (confirmado)
+    usableArea: 139,            // m2 utiles (confirmado)
+    plotArea: 982,              // m2 parcela (confirmado — 3x media Retamar)
+    porchArea: 53,              // m2 porche cubierto
 
-    isEstimated: true           // marca para mostrar warning en UI
+    bedrooms: 4,                // 3 dormitorios + 1 despacho/habitacion
+    bathrooms: 2,
+    floors: 1,                  // toda la vivienda en planta baja
+
+    yearBuilt: null,            // no figura en anuncio (asumir 1995-2005 por arquitectura)
+    floor: "1 planta",
+    parking: true,              // plaza garaje incluida
+    pool: true,                 // confirmado equipamiento
+    terrace: true,              // confirmado
+    storage: false,             // no figura trastero
+    energyCert: "En tramite",   // sin certificado emitido
+    heating: false,             // NO dispone de calefaccion (penalty)
+    orientation: "Sur, Este",
+    wardrobes: true,            // armarios empotrados
+
+    // Caracteristicas singulares (valor cualitativo)
+    extras: [
+      "Patio andaluz con aljibe (arquitectura sur Espana)",
+      "Porche 53 m² acceso a piscina y jardin",
+      "Vestidor amplio con vistas al jardin",
+      "Cocina con despensa",
+      "Despacho independiente",
+      "Jardin que rodea toda la casa",
+      "Sin comunidad (chalet exento)",
+      "13 km centro Almeria / cerca Hospital Toyo, golf y aeropuerto"
+    ],
+
+    distanceBeachM: 1100,       // >1km confirmado por usuario
+    distanceAirportKm: 4,       // aeropuerto Almeria
+    distanceHospitalKm: 1.5,    // Hospital del Toyo
+    distanceCenterKm: 13,
+
+    listingAgeWeeks: 5,         // "actualizado hace mas de un mes"
+    photosCount: 79,
+
+    communityFeesMonth: 0,      // chalet independiente, sin comunidad
+    ibiYear: 580,               // estimado segun valor catastral
+
+    isEstimated: false
   },
 
   // ---------- SERIES HISTORICAS €/m2 (1995-2026) ----------
@@ -67,44 +91,87 @@ window.REPORT_DATA = {
   ],
 
   // ---------- PRECIO ALQUILER (mayo 2026, €/m²/mes) ----------
+  // OJO: Espuela 59 esta a >1km de playa. Reduce viabilidad vacacional.
+  // longTerm aplica todo el anyo, vacation solo si esta cerca playa.
   rental: {
     longTerm:   { retamar: 10.5, almeria: 9.2,  almerimar: 9.0, ejido: 6.8, sanjose: 12.0 },
     vacation:   { // EUR/dia temporada media, villa 4 hab piscina
       retamar: 280, almeria: 200, almerimar: 250, ejido: 120, sanjose: 350
     },
-    occupancyVacationPct: 55   // % ocupacion media anual realista en Retamar
+    occupancyVacationPct: 55,    // % ocupacion realista Retamar cerca playa
+    farFromBeachPenaltyPct: -35  // descuento ingresos vacacional si >1km playa
   },
 
-  // ---------- BENCHMARKS Y AJUSTES ----------
-  // Constantes calibradas con comparables reales de Retamar (2024-2026).
-  // Una villa media en Retamar (~200m² + 300m² parcela, reformada, 400m
-  // de playa) cotiza ~2.700-2.850 €/m². Por encima esta primera linea
-  // (3.000+ €/m²), por debajo el adosado en urbanizacion (~2.300 €/m²).
+  // ---------- BENCHMARKS Y AJUSTES (modelo tasador) ----------
+  // Modelo de valoracion: VALOR TERRENO + VALOR CONSTRUCCION
+  // Como hace un tasador profesional (Tinsa, Tasaciones Hipotecarias).
+  // El modelo simple €/m² subestima el valor cuando la parcela es grande
+  // (caso Espuela 59: parcela 982m² ~ 3x media Retamar).
   benchmarks: {
     retamarAvgPricePerM2_2026: 2400,   // media TODOS tipos (Idealista 2.182 / Fotocasa 2.616)
-    retamarVillaPremiumPct: 8,         // villa independiente vs media (producto escaso)
-    reformedPremiumPct: 5,             // estado reformado vs estado generico
-    beachProximityPenalty: {           // ajuste por distancia caminando a playa
-      "<200m": 5, "200-500m": 0, "500-1000m": -5, ">1000m": -10
+
+    // Valor SUELO Retamar por m² (solar urbano residencial)
+    // Tier 1 = jardin proximo casa, tier 2 = parcela amplia, tier 3 = excedente segregable
+    plotValueTiers: [
+      { upto: 200, valuePerM2: 80 },   // primeros 200m² de jardin
+      { upto: 500, valuePerM2: 150 },  // siguientes 300m² (parcela amplia)
+      { upto: Infinity, valuePerM2: 220 } // excedente real (potencialmente segregable)
+    ],
+
+    // Valor CONSTRUCCION por m² (mercado, no reposicion)
+    // Para villa Retamar segunda mano en buen estado, lo que paga el comprador
+    // por el edificio terminado (incluye prima por evitar obra y trámites).
+    constructionValuePerM2: 1900,      // base "buen estado" — calibrado con comparables
+
+    // Ajustes al valor construccion
+    constructionAdjustments: {
+      reformedPct: 12,                  // si reformado integral: +12%
+      noHeatingPct: -4,                 // sin calefaccion: -4%
+      energyCertPendingPct: -3,         // cert energetico en tramite/desconocido: -3%
+      energyCertGoodPct: 5,             // cert A/B: +5%
+      energyCertBadPct: -6,             // cert F/G: -6%
+      sourceOrientationPct: 2,          // orientacion sur/este: +2%
+      singleFloorPct: 3,                // 1 sola planta (mas accesible, vivienda principal): +3%
+      poolPct: 4,                       // piscina propia: +4% sobre valor construccion
+      noParkingPct: -3                  // sin garaje: -3%
     },
-    plotPremiumPerM2: 80,              // €/m² para parcela EXCEDENTE sobre footprint
-    footprintRatio: 0.5,               // footprint asumido = construido x ratio (chalet 2 plantas)
-    sellingTimeMonths: 4.8,            // tiempo medio para vender en Retamar (Idealista)
-    sellerDiscountAvgPct: 6.2          // descuento medio sobre precio inicial (Idealista 2025)
+
+    // Ajustes generales por ubicacion dentro de Retamar
+    // 1km no es catastrofico en Retamar - es zona residencial, no
+    // exclusivamente turistica. Penalty moderado, no severo.
+    beachProximityAdjPct: {
+      "<200m": 8, "200-500m": 0, "500-1000m": -4, ">1000m": -8
+    },
+
+    // Premium por extras singulares (valor cualitativo)
+    extrasPremiumEur: {
+      patioAndaluz: 8000,               // patio singular con aljibe
+      bigGardenMature: 12000,           // jardin maduro rodea casa (valor visual)
+      noCommunityFees: 5000             // sin comunidad: ahorro percibido
+    },
+
+    // Indicadores de mercado para negociacion
+    sellingTimeMonths: 4.8,             // tiempo medio para vender en Retamar (Idealista)
+    sellerDiscountAvgPct: 6.2,          // descuento medio sobre precio inicial (Idealista 2025)
+    listingAgeFlexibilityPct: {         // descuento adicional segun edad anuncio
+      "<2sem": 0, "2-6sem": 2, "6-12sem": 4, ">12sem": 7
+    }
   },
 
-  // ---------- RIESGOS (matriz cualitativa 0-10) ----------
+  // ---------- RIESGOS (matriz cualitativa 0-10, especifica Espuela 59) ----------
   risks: [
-    { name:"Inundabilidad / cota inundable",   level: 3, note:"Retamar Sur tiene tramos en cota inundable T-500. Verificar mapa CHGuadalquivir y Junta Andalucia." },
-    { name:"Costas / Ley de Costas (servidumbre)", level: 4, note:"Primera linea de Retamar tiene servidumbre de proteccion 100m. Verificar deslinde vigente." },
-    { name:"Suelo agricola colindante",        level: 5, note:"Invernaderos al norte (Cabo de Gata). Impacto visual/olfativo en dias de viento sur." },
-    { name:"Liquidez de salida (tiempo venta)", level: 4, note:"4-6 meses tipico. Estacionalidad: el verano triplica visitas." },
-    { name:"Sequia / suministro agua",          level: 6, note:"Almeria en estres hidrico estructural. Posibles restricciones piscinas/riego." },
-    { name:"Turistificacion regulatoria",      level: 5, note:"Andalucia endurece licencias VFT desde 2024. Comprobar que el municipio no haya cerrado licencias nuevas." },
-    { name:"IBI / fiscalidad municipal",        level: 3, note:"IBI Almeria ~0.46% del valor catastral. Estable." },
-    { name:"Aeropuerto (ruido)",                level: 4, note:"Almeria AP a 4 km. Cono norte puede afectar parte de Retamar (consulta huellas acusticas AESA)." },
-    { name:"Plan urbanistico (recalificacion)", level: 2, note:"PGOU Almeria 2024 no preve grandes cambios en Retamar consolidado." },
-    { name:"Vicios ocultos (obra <15 anyos)",   level: 3, note:"Construccion 2005-2010 con materiales del boom. Revisar humedades, cubierta y aluminosis improbable." }
+    { name:"Sin calefaccion instalada",         level: 6, note:"El anuncio confirma 'no dispone de calefaccion'. Almeria tiene inviernos templados pero diciembre-febrero pide calefaccion al menos por la noche. Coste instalar bomba calor/aerotermia con conductos: 5.000-8.000 €. Aprovechar como palanca de negociacion." },
+    { name:"Certificado energetico pendiente",  level: 5, note:"Anuncio dice 'en tramite'. Casa de los 90-00 sin calefaccion + ventanas probablemente no premium = probable E o F. Coste emision: ~150 €. Impacto: si sale F, dificulta hipoteca a algunos bancos y rebaja valor 4-6%." },
+    { name:"Aljibe / pozo (verificar legalidad)", level: 5, note:"El anuncio menciona aljibe en patio andaluz. Verificar: (a) si es solo elemento ornamental o pozo activo, (b) si tiene legalizacion CHGuadalquivir, (c) calidad agua si se usa para riego/piscina, (d) ITC de mantenimiento." },
+    { name:"Distancia a playa >1km",            level: 4, note:"Limita uso turistico vacacional (los inquilinos de Retamar quieren playa <500m). Ventaja: zona mas tranquila, menos turismo de paso. Bueno para vivienda habitual o segunda residencia familiar." },
+    { name:"Parcela grande = mantenimiento",    level: 4, note:"982 m² requieren mantenimiento intensivo: jardinero ocasional (40-80 €/mes), riego automatico, piscina (300-500 €/anyo). Calcular como gasto fijo en la operacion." },
+    { name:"Aeropuerto (ruido)",                level: 5, note:"Almeria AP a 4 km. Camino Espuela esta en eje norte-sur de Retamar - cono de aproximacion puede afectar. Comprobar huellas acusticas AESA y la frecuencia real de vuelos (Ryanair, etc)." },
+    { name:"Invernaderos colindantes",          level: 4, note:"Al norte de Retamar empieza el mar de plastico de Cabo de Gata. Impacto visual a 1-2 km. Dias de viento sur: olor a pesticida/fitosanitarios ocasional." },
+    { name:"Sequia / restricciones agua",       level: 7, note:"Almeria en estres hidrico estructural cronico. Riesgo real de restricciones piscina/riego en proximos veranos. Importante con parcela 982 m² + piscina." },
+    { name:"Construccion sin reformar integral", level: 4, note:"'Segunda mano / buen estado' = no reforma reciente. Probables actualizaciones diferidas: instalacion electrica, fontaneria PVC vs PER, ventanas (¿climalit?), aislamiento cubierta. Presupuestar 15-25k para puesta a punto." },
+    { name:"Anuncio activo >5 semanas",         level: 3, note:"Aunque permite negociar, tambien hay que preguntarse por que no se ha vendido: ¿precio alto?, ¿vicios ocultos?, ¿zona menos demandada? Investigar." },
+    { name:"Liquidez de salida (revender)",     level: 4, note:"Tiempo medio venta en Retamar: 4-6 meses. Para una villa con esta parcela y sin playa cerca, el comprador objetivo es estrecho (familias locales, no extranjeros). Estima 6-9 meses para revender." },
+    { name:"Sin comunidad = sin servicios",     level: 2, note:"Como chalet exento no pagas comunidad, pero tampoco tienes mantenimiento de zonas comunes, seguridad ni servicio recoge basura comunitario. Asume tu mismo el mantenimiento exterior." }
   ],
 
   // ---------- METODOLOGIA Y FUENTES ----------

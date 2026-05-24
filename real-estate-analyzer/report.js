@@ -28,65 +28,155 @@
 
   // ---------- 1. Property grid ----------
   const p = D.property;
-  const pricePerM2Ask = p.askingPrice / p.builtArea;
   const propFields = [
+    ['Direccion', p.address || `${p.zone}, ${p.municipality}`],
     ['Tipo', p.type],
     ['Estado', p.state],
     ['Construidos', `${p.builtArea} m²`],
     ['Útiles', `${p.usableArea} m²`],
-    ['Parcela', `${p.plotArea} m²`],
+    ['Parcela', `${num(p.plotArea)} m²`],
+    ['Porche', p.porchArea ? `${p.porchArea} m²` : '—'],
+    ['Plantas', `${p.floors || '?'}`],
     ['Hab. / Baños', `${p.bedrooms} / ${p.bathrooms}`],
-    ['Año construcción', p.yearBuilt],
+    ['Año construcción', p.yearBuilt || 'No figura'],
     ['Cert. energético', p.energyCert],
-    ['Distancia playa', `${p.distanceBeachM} m`],
+    ['Calefacción', p.heating === false ? '✗ No dispone' : (p.heating ? '✓' : '?')],
+    ['Orientación', p.orientation || '—'],
+    ['Distancia playa', `${num(p.distanceBeachM)} m`],
+    ['Aeropuerto', p.distanceAirportKm ? `${p.distanceAirportKm} km` : '—'],
     ['Piscina', p.pool ? '✓ Privada' : '—'],
-    ['Garaje', p.parking ? '✓' : '—'],
-    ['Trastero', p.storage ? '✓' : '—'],
+    ['Garaje', p.parking ? '✓ Incluido' : '—'],
     ['Terraza', p.terrace ? '✓' : '—'],
-    ['Comunidad', `${eur(p.communityFeesMonth)}/mes`],
-    ['IBI', `${eur(p.ibiYear)}/año`]
+    ['Comunidad', p.communityFeesMonth === 0 ? 'Sin comunidad' : `${eur(p.communityFeesMonth)}/mes`],
+    ['IBI estimado', `${eur(p.ibiYear)}/año`],
+    ['Anuncio', p.listingAgeWeeks ? `${p.listingAgeWeeks} semanas activo` : '—']
   ];
   document.getElementById('propGrid').innerHTML = propFields
     .map(([k, v]) => `<div class="dg-item"><div class="dg-k">${k}</div><div class="dg-v">${v}</div></div>`)
     .join('');
 
-  // ---------- 2. Valor estimado (fair value) ----------
-  // Punto de partida: media €/m² Retamar
-  // + premium villa (parcela + piscina)
-  // + premium estado reformado
-  // - penalty distancia playa
-  // + valor parcela por exceso
+  // Extras singulares
+  if (p.extras && p.extras.length) {
+    const extrasHtml = `<div class="card" style="margin-top:12px;background:rgba(212,175,55,0.03);border-color:rgba(212,175,55,0.2)">
+      <div class="card-title" style="color:var(--gold-2)">★ Características singulares</div>
+      <ul style="margin:0; padding-left: 18px; color: var(--text-dim); font-size: 13px; line-height: 1.7;">
+        ${p.extras.map(e => `<li>${e}</li>`).join('')}
+      </ul>
+    </div>`;
+    document.getElementById('propGrid').parentElement.insertAdjacentHTML('afterend', extrasHtml);
+  }
+
+  // ---------- 2. Valor estimado · modelo TASADOR (suelo + construccion) ----------
   const b = D.benchmarks;
-  const baseM2 = b.retamarAvgPricePerM2_2026;
-  const villaPremium = baseM2 * (b.retamarVillaPremiumPct / 100);
-  const statePremium = p.state.toLowerCase().includes('reformado') || p.state.toLowerCase().includes('estrenar')
-    ? baseM2 * (b.reformedPremiumPct / 100)
-    : 0;
-  let beachPenalty = 0;
-  if (p.distanceBeachM < 200) beachPenalty = baseM2 * (b.beachProximityPenalty["<200m"] / 100);
-  else if (p.distanceBeachM < 500) beachPenalty = baseM2 * (b.beachProximityPenalty["200-500m"] / 100);
-  else if (p.distanceBeachM < 1000) beachPenalty = baseM2 * (b.beachProximityPenalty["500-1000m"] / 100);
-  else beachPenalty = baseM2 * (b.beachProximityPenalty[">1000m"] / 100);
 
-  const adjustedM2 = baseM2 + villaPremium + statePremium + beachPenalty;
-  const buildingValue = adjustedM2 * p.builtArea;
-  // Parcela: solo cuenta el EXCEDENTE sobre footprint (footprint = construido x ratio)
-  const footprint = p.builtArea * b.footprintRatio;
-  const excessPlot = Math.max(0, p.plotArea - footprint);
-  const plotValue = excessPlot * b.plotPremiumPerM2;
-  const fairValue = Math.round(buildingValue + plotValue);
+  // (A) VALOR DEL SUELO — graduado por tramos
+  // Footprint = lo que ocupa la casa en planta. Si 1 planta = built, si N plantas = built/N
+  const floors = p.floors || 2;
+  const footprint = p.builtArea / floors;
+  let remaining = Math.max(0, p.plotArea - footprint);
+  let landValue = 0;
+  let landBreakdown = [];
+  for (const tier of b.plotValueTiers) {
+    if (remaining <= 0) break;
+    const take = Math.min(tier.upto, remaining);
+    landValue += take * tier.valuePerM2;
+    landBreakdown.push({ m2: Math.round(take), perM2: tier.valuePerM2, value: Math.round(take * tier.valuePerM2) });
+    remaining -= take;
+  }
+
+  // (B) VALOR DE LA CONSTRUCCION — base + ajustes %
+  const adj = b.constructionAdjustments;
+  let constructionM2 = b.constructionValuePerM2;
+  const constructionAdjs = [];
+  const applyAdj = (label, pct) => {
+    if (!pct) return;
+    const delta = constructionM2 * (pct / 100);
+    constructionM2 += delta;
+    constructionAdjs.push({ label, pct, delta: Math.round(delta * p.builtArea) });
+  };
+
+  // Estado
+  if (/reformado|reformada|estrenar|nueva/i.test(p.state)) applyAdj('Reforma integral', adj.reformedPct);
+  // Calefaccion
+  if (p.heating === false) applyAdj('Sin calefaccion', adj.noHeatingPct);
+  // Cert energetico
+  const ec = (p.energyCert || '').toLowerCase();
+  if (/tramite|pendiente|desconocid/i.test(ec) || !ec) applyAdj('Cert. energetico pendiente', adj.energyCertPendingPct);
+  else if (/^[ab]$/i.test(p.energyCert)) applyAdj('Cert. energetico A/B', adj.energyCertGoodPct);
+  else if (/^[fg]$/i.test(p.energyCert)) applyAdj('Cert. energetico F/G', adj.energyCertBadPct);
+  // Orientacion
+  if (p.orientation && /sur|sureste|sur, este/i.test(p.orientation)) applyAdj('Orientacion sur/este', adj.sourceOrientationPct);
+  // 1 planta
+  if (p.floors === 1) applyAdj('Vivienda en 1 planta', adj.singleFloorPct);
+  // Piscina
+  if (p.pool) applyAdj('Piscina privada', adj.poolPct);
+  // Garaje
+  if (!p.parking) applyAdj('Sin garaje', adj.noParkingPct);
+  // Distancia playa
+  let beachKey;
+  if (p.distanceBeachM < 200) beachKey = '<200m';
+  else if (p.distanceBeachM < 500) beachKey = '200-500m';
+  else if (p.distanceBeachM < 1000) beachKey = '500-1000m';
+  else beachKey = '>1000m';
+  applyAdj(`Distancia playa ${beachKey}`, b.beachProximityAdjPct[beachKey]);
+
+  const constructionValue = Math.round(constructionM2 * p.builtArea);
+
+  // (C) EXTRAS SINGULARES
+  let extrasValue = 0;
+  const extrasBreakdown = [];
+  if (p.extras && p.extras.some(e => /patio andaluz|aljibe/i.test(e))) {
+    extrasValue += b.extrasPremiumEur.patioAndaluz;
+    extrasBreakdown.push({ label: 'Patio andaluz con aljibe', value: b.extrasPremiumEur.patioAndaluz });
+  }
+  if (p.extras && p.extras.some(e => /jardin.*rodea|jardin maduro/i.test(e))) {
+    extrasValue += b.extrasPremiumEur.bigGardenMature;
+    extrasBreakdown.push({ label: 'Jardin maduro envuelve casa', value: b.extrasPremiumEur.bigGardenMature });
+  }
+  if (p.communityFeesMonth === 0) {
+    extrasValue += b.extrasPremiumEur.noCommunityFees;
+    extrasBreakdown.push({ label: 'Sin comunidad (chalet exento)', value: b.extrasPremiumEur.noCommunityFees });
+  }
+
+  // (D) FAIR VALUE total
+  const fairValue = Math.round(landValue + constructionValue + extrasValue);
   const fairPerM2 = Math.round(fairValue / p.builtArea);
-
+  const pricePerM2Ask = p.askingPrice / p.builtArea;
   const deltaToAsk = p.askingPrice - fairValue;
   const deltaPct = (deltaToAsk / fairValue) * 100;
 
-  // Offer: 8% por debajo del fair value (ancla baja para negociar)
-  const initialOffer = Math.round(fairValue * 0.92 / 1000) * 1000;
-  // Walk-away: fair value + 3% (max premium por buen estado/ubicación específica)
-  const walkAway = Math.round(fairValue * 1.03 / 1000) * 1000;
+  // (E) Negociacion — ancla considerando edad del anuncio
+  let listingFlexKey;
+  const w = p.listingAgeWeeks || 0;
+  if (w < 2) listingFlexKey = '<2sem';
+  else if (w < 6) listingFlexKey = '2-6sem';
+  else if (w < 12) listingFlexKey = '6-12sem';
+  else listingFlexKey = '>12sem';
+  const extraListingDiscount = b.listingAgeFlexibilityPct[listingFlexKey];
+
+  // Si el precio pedido YA esta bajo fair value, no se ancla por debajo del fair,
+  // se ancla mas cerca del precio pedido para cerrar rapido sin perder oportunidad
+  let initialOffer, walkAway, anchorStrategy;
+  if (deltaPct < -3) {
+    // Inmueble infravalorado: cerrar rapido. Oferta -4% del asking.
+    initialOffer = Math.round(p.askingPrice * 0.96 / 1000) * 1000;
+    walkAway = Math.round(p.askingPrice * 1.00 / 1000) * 1000;
+    anchorStrategy = 'pegado al asking';
+  } else {
+    // Inmueble en fair o sobrevalorado: ancla en fair value -8% y +descuento por edad
+    const discountPct = 8 + extraListingDiscount;
+    initialOffer = Math.round(fairValue * (1 - discountPct / 100) / 1000) * 1000;
+    walkAway = Math.round(fairValue * 1.02 / 1000) * 1000;
+    anchorStrategy = `fair value - ${discountPct}%`;
+  }
+
+  // Expose for debug / negotiation table
+  const valuationTrace = { landBreakdown, landValue, constructionAdjs, constructionValue, extrasBreakdown, extrasValue, beachKey, listingFlexKey };
+  window.__VAL_TRACE = valuationTrace;
 
   // ---------- 3. Verdict ----------
   let verdictClass, verdictBadge, verdictHL, verdictTxt;
+  const closingMid = Math.round((initialOffer + walkAway) / 2 / 1000) * 1000;
   if (deltaPct > 10) {
     verdictClass = 'v-pass'; verdictBadge = 'CARO — Negociar fuerte o pasar';
     verdictHL = `El vendedor pide un ${pct(deltaPct)} por encima del valor justo`;
@@ -94,15 +184,20 @@
   } else if (deltaPct > 3) {
     verdictClass = 'v-hold'; verdictBadge = 'NEGOCIAR — Margen objetivo claro';
     verdictHL = `Precio razonable pero con ${pct(deltaPct)} de recorrido a la baja`;
-    verdictTxt = `El precio está ligeramente por encima del valor justo (${eur(fairValue)} estimado). Es típico: en Retamar el descuento medio sobre precio inicial es del ${b.sellerDiscountAvgPct}%. Abre con ${eur(initialOffer)} (8% bajo fair value), techo de negociación en ${eur(walkAway)}. Margen realista a obtener: ${eur(p.askingPrice - walkAway)}.`;
+    verdictTxt = `El precio está ligeramente por encima del valor justo (${eur(fairValue)} estimado). En Retamar el descuento medio sobre precio inicial es del ${b.sellerDiscountAvgPct}%. Abre con ${eur(initialOffer)}, techo en ${eur(walkAway)}. Cierre realista en ${eur(closingMid)}. Margen a obtener: ${eur(p.askingPrice - closingMid)}.`;
   } else if (deltaPct > -3) {
     verdictClass = 'v-buy'; verdictBadge = 'PRECIO JUSTO — Avanzar';
-    verdictHL = `Precio dentro del rango de valor de mercado`;
-    verdictTxt = `El vendedor pide muy cerca del fair value (${eur(fairValue)}). Hay poco margen para regatear pero tampoco estás pagando de más. Si los fundamentales encajan (ubicación exacta, estado verificado, certificación energética), una oferta en ${eur(initialOffer)} es razonable como ancla, cerrando en torno al precio pedido si la operación se desencalla rápido.`;
+    verdictHL = `Precio dentro del rango de valor de mercado (${pct(-deltaPct)})`;
+    verdictTxt = `El vendedor pide muy cerca del fair value (${eur(fairValue)}). Margen ajustado para regatear pero no estás pagando de más. Si los fundamentales encajan, oferta en ${eur(initialOffer)} como ancla, cerrar en torno a ${eur(closingMid)}.`;
   } else {
-    verdictClass = 'v-buy'; verdictBadge = 'OPORTUNIDAD — Por debajo de mercado';
-    verdictHL = `El precio pedido está por debajo del fair value`;
-    verdictTxt = `Curioso: el vendedor pide ${pct(Math.abs(deltaPct))} POR DEBAJO del valor de mercado. Verifica que no hay gato encerrado (cargas, vicios ocultos, lindes en disputa, proceso de divorcio/herencia urgente). Si la due diligence sale limpia, oferta cerca del precio pedido para evitar competencia: ${eur(Math.round(p.askingPrice * 0.97 / 1000) * 1000)}.`;
+    verdictClass = 'v-buy'; verdictBadge = 'OPORTUNIDAD — Por debajo del fair value';
+    verdictHL = `Precio pedido un ${pct(-deltaPct, 1)} POR DEBAJO del valor objetivo`;
+    const reasons = [];
+    if (p.heating === false) reasons.push('falta calefacción');
+    if (/tramite|pendiente/i.test(p.energyCert || '')) reasons.push('cert. energético sin emitir');
+    if (p.distanceBeachM > 1000) reasons.push('distancia a playa &gt;1km');
+    const reasonsStr = reasons.length ? `por <em>${reasons.join(', ')}</em>` : '';
+    verdictTxt = `El vendedor lo ha precificado bajo ${reasonsStr}. Si la due diligence sale limpia (nota simple, peritaje, sin cargas), <strong>cierra rápido</strong>: oferta en ${eur(initialOffer)} (-${((1 - initialOffer / p.askingPrice) * 100).toFixed(1)}% del asking) y cierre realista en ${eur(closingMid)}. Bajar más del 6-7% del asking = riesgo real de que entre otro comprador.`;
   }
   const vb = document.getElementById('verdictBadge');
   vb.className = 'verdict-badge ' + verdictClass;
@@ -242,37 +337,69 @@
     </tr>`;
   }).join('');
 
-  // ---------- 6. Negotiation breakdown ----------
-  const negBreak = [
-    { label: 'Precio pedido por el vendedor', amount: p.askingPrice, kind: 'start' },
-    { label: 'Sobreprecio vs €/m² medio Retamar', amount: -(pricePerM2Ask - baseM2) * p.builtArea, kind: 'adj' },
-    { label: `Premium villa (parcela ${p.plotArea}m² + piscina)`, amount: villaPremium * p.builtArea, kind: 'add' },
-    { label: 'Premium por estado reformado', amount: statePremium * p.builtArea, kind: 'add' },
-    { label: `Ajuste distancia playa (${p.distanceBeachM}m)`, amount: beachPenalty * p.builtArea, kind: 'adj' },
-    { label: `Valor parcela excedente (${num(excessPlot)}m² × ${eur(b.plotPremiumPerM2)})`, amount: plotValue, kind: 'add' },
-    { label: 'Descuento medio observado en Retamar (-' + b.sellerDiscountAvgPct + '%)', amount: -p.askingPrice * b.sellerDiscountAvgPct / 100, kind: 'neg' },
-    { label: 'Valor objetivo · fair value', amount: fairValue, kind: 'total' }
-  ];
+  // ---------- 6. Valoracion (modelo tasador) ----------
+  const negLines = [];
+  negLines.push({ label: 'Precio pedido por el vendedor', amount: p.askingPrice, kind: 'start' });
+  negLines.push({ label: '', kind: 'sep', text: 'A. Valor del suelo (parcela ' + num(p.plotArea) + ' m²)' });
+  valuationTrace.landBreakdown.forEach(tier => {
+    negLines.push({ label: `Suelo · ${tier.m2} m² × ${eur(tier.perM2)}/m²`, amount: tier.value, kind: 'add' });
+  });
+  negLines.push({ label: '', kind: 'sep', text: 'B. Valor construccion (' + p.builtArea + ' m²)' });
+  negLines.push({ label: `Base construccion · ${num(p.builtArea)} m² × ${eur(b.constructionValuePerM2)}/m²`, amount: p.builtArea * b.constructionValuePerM2, kind: 'add' });
+  valuationTrace.constructionAdjs.forEach(a => {
+    negLines.push({ label: `${a.label} (${a.pct > 0 ? '+' : ''}${a.pct}%)`, amount: a.delta, kind: a.delta >= 0 ? 'add' : 'neg' });
+  });
+  if (valuationTrace.extrasBreakdown.length) {
+    negLines.push({ label: '', kind: 'sep', text: 'C. Extras singulares' });
+    valuationTrace.extrasBreakdown.forEach(e => negLines.push({ label: e.label, amount: e.value, kind: 'add' }));
+  }
+  negLines.push({ label: 'Valor objetivo (fair value)', amount: fairValue, kind: 'total' });
+  negLines.push({ label: `vs precio pedido · ${pct(deltaPct, 1)}`, amount: -deltaToAsk, kind: 'delta' });
 
-  document.getElementById('negBreakdown').innerHTML = negBreak.map(item => {
-    const sign = item.amount >= 0 ? 'pos' : 'neg';
+  document.getElementById('negBreakdown').innerHTML = negLines.map(item => {
+    if (item.kind === 'sep') {
+      return `<div style="margin: 12px 0 4px; padding-top: 8px; border-top:1px dashed var(--line); font-size:11px; color:var(--gold-2); text-transform:uppercase; letter-spacing:.5px; font-weight:600">${item.text}</div>`;
+    }
     if (item.kind === 'total') {
       return `<div class="neg-line total"><span class="neg-label">${item.label}</span><span class="neg-amount">${eur(item.amount)}</span></div>`;
     }
     if (item.kind === 'start') {
-      return `<div class="neg-line"><span class="neg-label">${item.label}</span><span class="neg-amount">${eur(item.amount)}</span></div>`;
+      return `<div class="neg-line" style="background:rgba(212,175,55,0.04); margin:0 -10px; padding:11px 10px; border-radius:6px"><span class="neg-label" style="color:var(--text);font-weight:600">${item.label}</span><span class="neg-amount" style="color:var(--text)">${eur(item.amount)}</span></div>`;
     }
+    if (item.kind === 'delta') {
+      const cls = item.amount >= 0 ? 'pos' : 'neg';
+      const colorbar = item.amount >= 0 ? 'var(--green)' : 'var(--red)';
+      return `<div class="neg-line" style="border-left: 3px solid ${colorbar}; padding-left: 8px"><span class="neg-label" style="color:${colorbar};font-weight:600">${item.label}</span><span class="neg-amount ${cls}">${item.amount >= 0 ? '+' : ''}${eur(item.amount)}</span></div>`;
+    }
+    const sign = item.amount >= 0 ? 'pos' : 'neg';
     return `<div class="neg-line"><span class="neg-label">${item.label}</span><span class="neg-amount ${sign}">${item.amount >= 0 ? '+' : ''}${eur(item.amount)}</span></div>`;
   }).join('');
 
-  // Negotiation strategy
-  document.getElementById('negStrategy').innerHTML = `
-    <p><strong>Apertura.</strong> Oferta inicial en <strong>${eur(initialOffer)}</strong> (≈8% bajo fair value). Justifica con: (1) descuento medio en Retamar del ${b.sellerDiscountAvgPct}%, (2) tiempo medio para vender 4-6 meses (vendedor con prisa), (3) precio €/m² superior al baseline del barrio (${num(baseM2)} €/m²).</p>
-    <p><strong>Palancas duras.</strong> ITE/peritaje (300-500€) y nota simple SIEMPRE antes de mejorar oferta. Si el peritaje saca hallazgos (humedades, instalaciones, aluminosis), descuenta literal el coste de reforma estimado del precio.</p>
-    <p><strong>Palancas blandas.</strong> Mostrarte como comprador serio (preaprobación hipotecaria escrita), flexibilidad en fecha de entrega, todo en metálico para arras (ahorra al vendedor incertidumbre). Estos detalles valen 1-2% reales del precio.</p>
-    <p><strong>Walk-away.</strong> Por encima de <strong>${eur(walkAway)}</strong> no compras. Es +3% sobre fair value, margen de seguridad razonable. Por encima, el mercado de Retamar te ofrece alternativas mejores (comparables ya listados).</p>
-    <p><strong>Estacionalidad.</strong> Septiembre-noviembre es el mejor momento para cerrar (post-verano, vendedores resignados a otro año sin vender). Evitar mayo-julio (alta demanda turística).</p>
-  `;
+  // ---------- Negotiation strategy ----------
+  const isUnderPriced = deltaPct < -3;
+  const flexNote = w >= 6 ? `<strong>Vendedor lleva ${w} semanas activo</strong> sin movimiento — alta probabilidad de aceptar oferta razonable.` : `Anuncio reciente (${w} semanas), vendedor con menos urgencia.`;
+
+  let strategyHtml;
+  if (isUnderPriced) {
+    strategyHtml = `
+      <p><strong>Caso atípico:</strong> el precio pedido está <strong style="color:var(--green)">${pct(-deltaPct)} POR DEBAJO</strong> del fair value. El vendedor lo ha precificado bajo por: (a) <em>${p.heating === false ? 'falta de calefacción' : ''}${p.heating === false && /tramite|pendiente/i.test(p.energyCert || '') ? ' + ' : ''}${/tramite|pendiente/i.test(p.energyCert || '') ? 'cert. energético sin emitir' : ''}</em>, (b) distancia a playa &gt;1km que limita el mercado turístico, (c) ${flexNote}.</p>
+      <p><strong>Estrategia recomendada — anclar pegado al asking, no fuerzar bajada agresiva.</strong> Si pides menos del 5-6%, riesgo real de perder el inmueble: con ese €/m² (€${num(Math.round(pricePerM2Ask))}/m²) entrará un comprador rival rápido.</p>
+      <p><strong>Apertura.</strong> Oferta inicial en <strong>${eur(initialOffer)}</strong> (-${((1 - initialOffer / p.askingPrice) * 100).toFixed(1)}% del asking). Justifica con: (1) coste instalación calefacción ~5-7k €, (2) descuento medio Retamar ${b.sellerDiscountAvgPct}%, (3) cert. energético en trámite (riesgo de salir E/F).</p>
+      <p><strong>Cerrar en torno a <span style="color:var(--gold-2)">${eur(Math.round((initialOffer + walkAway) / 2 / 1000) * 1000)}</span>.</strong> Walk-away: ${eur(walkAway)} (el precio pedido). Sobre eso, perderías el descuento "anti-frigción" típico del mercado almeriense.</p>
+      <p><strong>Ahorro realista esperado:</strong> entre <strong>${eur(p.askingPrice - initialOffer)}</strong> (apertura) y <strong>${eur(p.askingPrice - Math.round((initialOffer + walkAway) / 2 / 1000) * 1000)}</strong> (cierre medio).</p>
+      <p><strong>Palancas duras.</strong> ITE/peritaje (300-500€) y nota simple SIEMPRE antes de mejorar oferta. Si el peritaje saca hallazgos (humedades, instalaciones, aluminosis), descuenta literal el coste de reforma del precio.</p>
+      <p><strong>Estacionalidad.</strong> Septiembre-noviembre es el mejor momento para cerrar (post-verano, vendedor resignado). Evitar mayo-julio (alta demanda turística).</p>
+    `;
+  } else {
+    strategyHtml = `
+      <p><strong>Apertura.</strong> Oferta inicial en <strong>${eur(initialOffer)}</strong> (${anchorStrategy}, -${((1 - initialOffer / p.askingPrice) * 100).toFixed(1)}% del asking). Justifica con: (1) descuento medio en Retamar del ${b.sellerDiscountAvgPct}%, (2) ${flexNote}, (3) precio €/m² superior al fair value (€${num(fairPerM2)}/m²).</p>
+      <p><strong>Palancas duras.</strong> ITE/peritaje (300-500€) y nota simple SIEMPRE antes de mejorar oferta. Si el peritaje saca hallazgos, descuenta literal el coste estimado de reforma del precio.</p>
+      <p><strong>Palancas blandas.</strong> Mostrarte como comprador serio (preaprobación hipotecaria escrita), flexibilidad en fecha de entrega, todo en metálico para arras. Estos detalles valen 1-2% reales del precio.</p>
+      <p><strong>Walk-away.</strong> Por encima de <strong>${eur(walkAway)}</strong> no compras (+2% sobre fair value, margen de seguridad razonable).</p>
+      <p><strong>Ahorro realista esperado:</strong> entre <strong>${eur(p.askingPrice - initialOffer)}</strong> y <strong>${eur(p.askingPrice - walkAway)}</strong>.</p>
+    `;
+  }
+  document.getElementById('negStrategy').innerHTML = strategyHtml;
 
   // ---------- 7. Comparables ----------
   const compHtml = D.comparables.map(c => {
@@ -344,15 +471,18 @@
   document.getElementById('rentLTpct').textContent = `${rentLT_m2.toFixed(1)} €/m²/mes · ${eur(rentLT_year)}/año`;
   document.getElementById('yieldLT').textContent = netYieldLT.toFixed(2) + '%';
 
-  // Vacacional
-  const rentVT_day = D.rental.vacation.retamar;
-  const occupancy = D.rental.occupancyVacationPct / 100;
-  const rentVT_year = rentVT_day * 365 * occupancy;
+  // Vacacional — ajustado por distancia playa
+  const beachFar = p.distanceBeachM > 1000;
+  const beachAdj = beachFar ? (1 + (D.rental.farFromBeachPenaltyPct / 100)) : 1;
+  const occupancyAdj = beachFar ? 0.40 : (D.rental.occupancyVacationPct / 100);
+  const rentVT_day = Math.round(D.rental.vacation.retamar * beachAdj);
+  const rentVT_year = Math.round(rentVT_day * 365 * occupancyAdj);
   const grossYieldVT = (rentVT_year / fairValue) * 100;
-  // Net: 25% gestión + limpieza, 12% gastos + IBI + tasa turística, 8% mantenimiento intensivo
   const netYieldVT = grossYieldVT * (1 - 0.25 - 0.12 - 0.08);
   document.getElementById('rentVT').textContent = eur(rentVT_year);
-  document.getElementById('rentVTpct').textContent = `${eur(rentVT_day)}/día · ${(occupancy * 100).toFixed(0)}% ocupación`;
+  document.getElementById('rentVTpct').textContent = beachFar
+    ? `${eur(rentVT_day)}/día · ${(occupancyAdj * 100).toFixed(0)}% ocupación (penaliza distancia playa)`
+    : `${eur(rentVT_day)}/día · ${(occupancyAdj * 100).toFixed(0)}% ocupación`;
   document.getElementById('yieldVT').textContent = netYieldVT.toFixed(2) + '%';
 
   // Proyección a 10 años (CAGR derivado de últimos 10 años de Retamar)
