@@ -436,6 +436,210 @@
   .card-narrative ul li { font-size: 13px; margin-bottom: 6px; }
   .card-narrative ul li strong { color: var(--gold-2); }
 
+  /* ---------- MACRO KPI ROW ---------- */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .mkpi {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .mkpi-lbl {
+    font-size: 10px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .mkpi-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold-2);
+    margin-top: 4px;
+  }
+  .mkpi-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* ---------- DRIVER GRID ---------- */
+  .driver-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .driver-col {
+    background: var(--bg-3);
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid var(--line);
+  }
+  .driver-fav { border-left: 3px solid var(--green); }
+  .driver-unfav { border-left: 3px solid var(--amber); }
+  .driver-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .driver-item {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--line);
+    font-size: 12px;
+  }
+  .driver-item:last-child { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
+  .driver-item strong { display: block; color: var(--text); font-size: 13px; margin-bottom: 3px; }
+  .driver-detail { color: var(--text-dim); font-size: 11.5px; line-height: 1.5; }
+
+  /* ---------- FINANCING ROWS ---------- */
+  .fin-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 4px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .fin-l { color: var(--text-dim); }
+  .fin-r { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .fin-tot {
+    background: rgba(212,175,55,0.04);
+    border-top: 1px solid var(--line);
+    border-bottom: 2px solid var(--gold-2);
+    margin-top: 4px;
+    padding: 9px 4px;
+  }
+  .fin-tot .fin-l, .fin-tot .fin-r { color: var(--text); font-size: 14px; }
+
+  /* ---------- MORTGAGE CARDS ---------- */
+  .mortgage-card {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .mortgage-card.mortgage-rec {
+    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+    border-color: rgba(212,175,55,0.4);
+    box-shadow: 0 0 0 1px rgba(212,175,55,0.15) inset;
+  }
+  .mortgage-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .mortgage-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .mortgage-meta {
+    font-size: 11px;
+    color: var(--text-mute);
+    margin-top: 3px;
+  }
+  .mortgage-monthly {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .mm-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold-2);
+    line-height: 1;
+  }
+  .mm-lbl {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .mortgage-totals {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin: 10px 0;
+  }
+  .mortgage-totals .mt {
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+    color: var(--text-mute);
+  }
+  .mortgage-totals .mt strong {
+    font-size: 14px;
+    color: var(--text);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .mortgage-procons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .proc-col { font-size: 12px; }
+  .proc-title {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .proc-item {
+    color: var(--text-dim);
+    line-height: 1.45;
+    margin-bottom: 3px;
+    font-size: 11.5px;
+  }
+
+  /* ---------- CHECKLIST ---------- */
+  .checklist-cat {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .checklist-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--gold-2);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    cursor: pointer;
+    line-height: 1.45;
+  }
+  .checklist-item input[type="checkbox"] {
+    margin-top: 3px;
+    accent-color: var(--gold);
+    flex-shrink: 0;
+  }
+  .checklist-item:hover { color: var(--text); }
+
   /* ---------- DESKTOP ---------- */
   @media (min-width: 720px) {
     body { font-size: 16px; }
@@ -447,6 +651,8 @@
     .datagrid .dg-item:nth-last-child(-n+3) { border-bottom: 0; }
     #fairValueBreakdown { grid-template-columns: repeat(2, 1fr); }
     .ctable { font-size: 13px; }
+    .kpi-row { grid-template-columns: repeat(4, 1fr); }
+    .driver-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
@@ -652,6 +858,99 @@
     <div class="card">
       <div class="card-title">Estrategia de compra · orden de visitas y ofertas</div>
       <div id="shoppingStrategy"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04E · ANÁLISIS MACRO + TIMING ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> ¿Es buen momento para comprar?</h2>
+      <div class="section-tag">Análisis macro · veredicto del experto</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Contexto macro mayo 2026 · drivers a favor y en contra</div>
+      <div id="macroAnalysis"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04F · PROYECCIÓN 10 AÑOS ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Proyección de precios · 10 años</h2>
+      <div class="section-tag">Histórico + escenarios 2027-2036</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Evolución €/m² Retamar (1995-2036)</div>
+      <div class="chart-wrap" style="height:320px"><canvas id="chartProjection"></canvas></div>
+      <p style="font-size:11px;color:var(--text-mute);margin:8px 0 0">
+        <strong style="color:#5aa9ff">Azul</strong>: histórico observado · <strong style="color:#d4af37">dorado</strong>: escenario base proyectado (CAGR ~3,3%) · líneas punteadas: rangos optimista y pesimista. Datos: Idealista informes 2003-2026, Fotocasa, Tinsa IMIE, INE.
+      </p>
+    </div>
+    <div class="card">
+      <div class="card-title">Valor estimado de Espuela 59 · año a año</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Modelo: suelo se aprecia +4%/año (escasez urbana consolidada Retamar), construcción +2,5%/año (inflación neta tras depreciación). Si cerráis a <strong style="color:var(--gold-2)">€465.000</strong>, así crece vuestro patrimonio:
+      </p>
+      <div class="table-scroll"><div id="projectionTable"></div></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04G · PLAN DE FINANCIACIÓN ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Plan de financiación</h2>
+      <div class="section-tag">Capital + gastos + LTV</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Estructura del cierre</div>
+      <div id="financingPlan"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04H · HIPOTECA ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Hipoteca · escenarios reales mayo 2026</h2>
+      <div class="section-tag">Fija vs Variable vs Mixta</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cuatro escenarios calculados sobre vuestra hipoteca</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Cuotas calculadas sobre los <strong style="color:var(--gold-2)">~€270.000</strong> de hipoteca necesaria con tipos reales de mercado mayo 2026.
+        TIN base: el tipo nominal anual aplicado al capital pendiente. TAE: incluye también seguros y comisiones obligatorias.
+      </p>
+      <div id="mortgageScenarios"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recomendación del experto</div>
+      <div id="mortgageRecommendation"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04I · TCO + BUY vs RENT ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Coste total de propiedad + comprar vs alquilar</h2>
+      <div class="section-tag">TCO 10 años</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cuota real mensual y análisis comprar vs alquilar</div>
+      <div id="tcoAnalysis"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04J · CHECKLIST EXPERTO ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Checklist del experto · antes de firmar</h2>
+      <div class="section-tag">Due diligence completa</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Tareas obligatorias antes de cada etapa</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Lista de verificación profesional. Marca los items conforme los completéis. <strong>No firméis arras sin completar el bloque "Documental"</strong>.
+      </p>
+      <div id="expertChecklist"></div>
     </div>
   </section>
 

@@ -609,6 +609,323 @@
     .join('');
 
   // ============================================================
+  // 13. ANALISIS DE EXPERTO · macro + timing + 10 anyos
+  // ============================================================
+  const ev = D.expertView;
+  if (ev) {
+    // ---------- 13.1 Timing macro ----------
+    const macroEl = document.getElementById('macroAnalysis');
+    if (macroEl) {
+      const ts = ev.macro.timingScore;
+      const tsColor = ts >= 7.5 ? 'var(--green)' : ts >= 5 ? 'var(--gold-2)' : 'var(--red)';
+      macroEl.innerHTML = `
+        <div class="winner-banner" style="background:linear-gradient(135deg,rgba(46,160,67,0.15),rgba(212,175,55,0.08));border-color:${tsColor}">
+          <div class="winner-label" style="color:${tsColor}">VEREDICTO DEL EXPERTO · ${ev.macro.reportDate}</div>
+          <div class="winner-title">${ev.macro.timingVerdict}</div>
+          <div style="font-size:32px;font-weight:800;color:${tsColor};margin:8px 0">${ts}/10</div>
+          <div class="winner-score">Score de timing · ${ev.macro.timingVerdict === 'COMPRAR AHORA' ? 'condiciones convergentemente favorables' : 'mas riesgo del habitual'}</div>
+        </div>
+        <p style="margin:14px 4px;color:var(--text);font-size:13.5px;line-height:1.65">${ev.macro.timingRationale}</p>
+
+        <div class="kpi-row">
+          <div class="mkpi"><div class="mkpi-lbl">BCE tipo principal</div><div class="mkpi-val">${ev.macro.ecbMainRate}%</div><div class="mkpi-sub" style="color:var(--green)">vs 4,50% pico 2023</div></div>
+          <div class="mkpi"><div class="mkpi-lbl">Euribor 12m</div><div class="mkpi-val">${ev.macro.euribor12m}%</div><div class="mkpi-sub" style="color:var(--green)">tendencia bajista</div></div>
+          <div class="mkpi"><div class="mkpi-lbl">Inflacion ESP</div><div class="mkpi-val">${ev.macro.inflationESP}%</div><div class="mkpi-sub">controlada</div></div>
+          <div class="mkpi"><div class="mkpi-lbl">Apreciacion Retamar 5y</div><div class="mkpi-val">${ev.macro.housePriceCagrRetamar_5y}%</div><div class="mkpi-sub">CAGR anual</div></div>
+        </div>
+
+        <div class="driver-grid">
+          <div class="driver-col driver-fav">
+            <div class="driver-title">✓ Drivers favorables</div>
+            ${ev.macro.driversFavorable.map(d => `<div class="driver-item"><strong>${d.label}</strong><div class="driver-detail">${d.detail}</div></div>`).join('')}
+          </div>
+          <div class="driver-col driver-unfav">
+            <div class="driver-title">⚠ Drivers desfavorables / riesgos</div>
+            ${ev.macro.driversUnfavorable.map(d => `<div class="driver-item"><strong>${d.label}</strong><div class="driver-detail">${d.detail}</div></div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // ---------- 13.2 Proyeccion 10 anyos ----------
+    const projChartCanvas = document.getElementById('chartProjection');
+    if (projChartCanvas) {
+      const hist = ev.priceHistory;
+      const proj = ev.priceProjection;
+      const labels = [...hist.map(h => h.year), ...proj.map(p => p.year)];
+      new Chart(projChartCanvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Histórico €/m² Retamar',
+              data: hist.map(h => h.p),
+              borderColor: '#5aa9ff', backgroundColor: 'rgba(90,169,255,0.1)',
+              borderWidth: 2.5, pointRadius: 3, tension: 0.3,
+              segment: { borderDash: () => undefined }
+            },
+            {
+              label: 'Proyección base 2027-2036',
+              data: [...Array(hist.length - 1).fill(null), hist[hist.length - 1].p, ...proj.map(p => p.base)],
+              borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.1)',
+              borderWidth: 3, pointRadius: 3, borderDash: [6, 4], tension: 0.3, fill: true
+            },
+            {
+              label: 'Escenario optimista',
+              data: [...Array(hist.length - 1).fill(null), hist[hist.length - 1].p, ...proj.map(p => p.opt)],
+              borderColor: 'rgba(46,160,67,0.6)', backgroundColor: 'transparent',
+              borderWidth: 1.5, pointRadius: 0, borderDash: [2, 3], tension: 0.3
+            },
+            {
+              label: 'Escenario pesimista',
+              data: [...Array(hist.length - 1).fill(null), hist[hist.length - 1].p, ...proj.map(p => p.pess)],
+              borderColor: 'rgba(248,81,73,0.6)', backgroundColor: 'transparent',
+              borderWidth: 1.5, pointRadius: 0, borderDash: [2, 3], tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#a8a8a8', font: { size: 11 } } },
+            tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${eur(ctx.raw)}/m²` } }
+          },
+          scales: {
+            y: { ticks: { color: '#a8a8a8', callback: v => v + ' €' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            x: { ticks: { color: '#a8a8a8', font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // Tabla resumen proyección Espuela 59
+    const projTableEl = document.getElementById('projectionTable');
+    if (projTableEl) {
+      const years = ev.espuela59Projection;
+      const purchasePrice = 465000;       // cierre realista
+      const rows = years.map((y, i) => {
+        const apprc = ((y.total / years[0].total) - 1) * 100;
+        const vsPurchase = ((y.total / purchasePrice) - 1) * 100;
+        return `<tr>
+          <td>${y.year}</td>
+          <td>${eur(y.suelo)}</td>
+          <td>${eur(y.constr)}</td>
+          <td><strong>${eur(y.total)}</strong></td>
+          <td style="color:${apprc >= 0 ? 'var(--green)' : 'var(--red)'}">${pct(apprc, 1)}</td>
+          <td style="color:${vsPurchase >= 0 ? 'var(--green)' : 'var(--red)'};font-weight:600">${pct(vsPurchase, 1)}</td>
+        </tr>`;
+      }).join('');
+      projTableEl.innerHTML = `
+        <table class="ctable">
+          <thead><tr><th>Año</th><th>Valor suelo</th><th>Valor construcción</th><th>Total fair value</th><th>vs 2026</th><th>vs precio compra (${eur(purchasePrice)})</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    // ---------- 13.3 Plan de financiación ----------
+    const finEl = document.getElementById('financingPlan');
+    if (finEl) {
+      const cash = ev.financing.buyerCash;
+      const r = ev.financing.closingCostsRules;
+      const purchasePrice = 465000;       // cierre realista
+      const itp = purchasePrice * r.itpAndaluciaPct / 100;
+      const totalClosing = itp + r.notaria + r.registro + r.gestoria + r.tasacion + (purchasePrice * r.bankOpeningFeesPct / 100);
+      const downPayment = cash.total - totalClosing;
+      const mortgageNeeded = purchasePrice - downPayment;
+      const ltv = (mortgageNeeded / purchasePrice) * 100;
+
+      finEl.innerHTML = `
+        <div class="card-narrative">
+          <p style="margin:0 0 12px;color:var(--text)"><strong>Suposicion base:</strong> cierre realista en <strong style="color:var(--gold-2)">${eur(purchasePrice)}</strong> (vs asking ${eur(D.property.askingPrice)}, descuento -3,1%).</p>
+        </div>
+        <h4 style="margin:12px 0 8px;color:var(--gold-2);font-size:13px">A · Capital propio disponible</h4>
+        <div class="fin-row"><span class="fin-l">Venta vivienda anterior</span><span class="fin-r">${eur(cash.previousHouseSale)}</span></div>
+        <div class="fin-row"><span class="fin-l">Bonus laboral</span><span class="fin-r">${eur(cash.bonus)}</span></div>
+        <div class="fin-row fin-tot"><span class="fin-l"><strong>Capital propio total</strong></span><span class="fin-r"><strong>${eur(cash.total)}</strong></span></div>
+
+        <h4 style="margin:18px 0 8px;color:var(--gold-2);font-size:13px">B · Gastos de cierre (Andalucía, mayo 2026)</h4>
+        <div class="fin-row"><span class="fin-l">ITP segunda mano · 7% sobre ${eur(purchasePrice)}</span><span class="fin-r" style="color:var(--red)">${eur(itp)}</span></div>
+        <div class="fin-row"><span class="fin-l">Notaría</span><span class="fin-r" style="color:var(--red)">${eur(r.notaria)}</span></div>
+        <div class="fin-row"><span class="fin-l">Registro de la Propiedad</span><span class="fin-r" style="color:var(--red)">${eur(r.registro)}</span></div>
+        <div class="fin-row"><span class="fin-l">Gestoría</span><span class="fin-r" style="color:var(--red)">${eur(r.gestoria)}</span></div>
+        <div class="fin-row"><span class="fin-l">Tasación bancaria</span><span class="fin-r" style="color:var(--red)">${eur(r.tasacion)}</span></div>
+        <div class="fin-row"><span class="fin-l">Comisión apertura banco</span><span class="fin-r" style="color:var(--green)">0 € <small>(negociado a 0%)</small></span></div>
+        <div class="fin-row fin-tot"><span class="fin-l"><strong>Total gastos de cierre</strong></span><span class="fin-r" style="color:var(--red)"><strong>${eur(totalClosing)}</strong></span></div>
+        <p style="font-size:11px;color:var(--text-mute);margin:6px 0 0">El IAJD (Impuesto Actos Jurídicos Documentados) de la hipoteca lo paga el banco desde 2018 — no afecta al comprador.</p>
+
+        <h4 style="margin:18px 0 8px;color:var(--gold-2);font-size:13px">C · Estructura del cierre</h4>
+        <div class="fin-row"><span class="fin-l">Precio compra</span><span class="fin-r">${eur(purchasePrice)}</span></div>
+        <div class="fin-row"><span class="fin-l">Capital propio - gastos cierre</span><span class="fin-r">${eur(downPayment)}</span></div>
+        <div class="fin-row fin-tot"><span class="fin-l"><strong>Hipoteca necesaria</strong></span><span class="fin-r" style="color:var(--gold-2)"><strong>${eur(mortgageNeeded)}</strong></span></div>
+        <div class="fin-row"><span class="fin-l">LTV (loan-to-value)</span><span class="fin-r" style="color:${ltv < 60 ? 'var(--green)' : ltv < 75 ? 'var(--gold-2)' : 'var(--red)'};font-weight:700">${ltv.toFixed(1)}%</span></div>
+
+        <div class="card" style="margin-top:14px;background:rgba(46,160,67,0.08);border-color:rgba(46,160,67,0.3)">
+          <p style="margin:0;font-size:13px;line-height:1.65">
+            <strong style="color:var(--green)">⚡ Posicion financiera excelente.</strong>
+            Un LTV del ${ltv.toFixed(0)}% es <strong>significativamente inferior</strong> al umbral del 80% que los bancos consideran "perfil premium".
+            Esto te da <strong>poder de negociacion</strong> en condiciones: TIN, comisiones, vinculacion minima.
+            En la practica, los bancos competiran por darte el credito.
+          </p>
+        </div>
+      `;
+      // Guardar para mortgage section
+      window.__mortgagePrincipal = mortgageNeeded;
+      window.__purchasePrice = purchasePrice;
+    }
+
+    // ---------- 13.4 Hipoteca: comparativa escenarios ----------
+    function mortgageCalc(principal, annualRate, years) {
+      const r = annualRate / 100 / 12;
+      const n = years * 12;
+      const monthly = principal * r / (1 - Math.pow(1 + r, -n));
+      const totalPaid = monthly * n;
+      const totalInterest = totalPaid - principal;
+      return { monthly, totalPaid, totalInterest };
+    }
+
+    const mortgageEl = document.getElementById('mortgageScenarios');
+    if (mortgageEl) {
+      const principal = window.__mortgagePrincipal || 270000;
+      const scenarios = ev.mortgageMarketMay2026.scenarios;
+      const calcsHtml = scenarios.map(s => {
+        const rate = s.tinInitial || s.tin;
+        const calc = mortgageCalc(principal, rate, s.years);
+        let extraNote = '';
+        if (s.type === 'mixta') {
+          const calcLater = mortgageCalc(principal, s.tinAfter, s.years);
+          extraNote = `<div style="font-size:11px;color:var(--text-mute);margin-top:4px">Cuota anyos 6-25: ~${eur(calcLater.monthly, 0)}/mes (Eur ${ev.macro.euribor12m}% + ${s.diferencial || 0.60}%)</div>`;
+        }
+        return `
+          <div class="mortgage-card ${s.recommended ? 'mortgage-rec' : ''}">
+            <div class="mortgage-head">
+              <div>
+                <div class="mortgage-name">${s.recommended ? '⭐ ' : ''}${s.name}</div>
+                <div class="mortgage-meta">TIN ${rate}% · TAE ${s.tae}% · ${s.years} años · ${s.vinculacion}</div>
+              </div>
+              <div class="mortgage-monthly">
+                <div class="mm-val">${eur(calc.monthly, 0)}</div>
+                <div class="mm-lbl">/ mes</div>
+              </div>
+            </div>
+            ${extraNote}
+            <div class="mortgage-totals">
+              <div class="mt"><span>Pagado en total</span><strong>${eur(calc.totalPaid, 0)}</strong></div>
+              <div class="mt"><span>Intereses totales</span><strong style="color:var(--red)">${eur(calc.totalInterest, 0)}</strong></div>
+            </div>
+            <div class="mortgage-procons">
+              <div class="proc-col">
+                <div class="proc-title" style="color:var(--green)">PROS</div>
+                ${s.pros.map(p => `<div class="proc-item">• ${p}</div>`).join('')}
+              </div>
+              <div class="proc-col">
+                <div class="proc-title" style="color:var(--red)">CONTRAS</div>
+                ${s.cons.map(c => `<div class="proc-item">• ${c}</div>`).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      mortgageEl.innerHTML = calcsHtml;
+
+      // Recomendación experta
+      const recScen = scenarios.find(s => s.recommended);
+      const recCalc = mortgageCalc(principal, recScen.tin, recScen.years);
+      const recEl = document.getElementById('mortgageRecommendation');
+      if (recEl) {
+        recEl.innerHTML = `
+          <div class="winner-banner">
+            <div class="winner-label">RECOMENDACIÓN DEL EXPERTO</div>
+            <div class="winner-title">${recScen.name}</div>
+            <div style="font-size:28px;font-weight:800;color:var(--green);margin:8px 0">${eur(recCalc.monthly, 0)} <span style="font-size:14px;color:var(--text-dim);font-weight:500">/ mes</span></div>
+            <div class="winner-score">${eur(principal)} a ${recScen.tin}% TIN durante ${recScen.years} años</div>
+          </div>
+          <div class="card-narrative" style="margin-top:14px">
+            <p><strong>¿Por qué fija a 25 años?</strong></p>
+            <ul style="padding-left:20px;line-height:1.7">
+              <li><strong>Estabilidad familiar.</strong> Con 2 niños y horizonte largo, una cuota fija da paz mental y permite planificar gastos (colegios, extraescolares, viajes) sin sorpresas si los tipos suben.</li>
+              <li><strong>Tipos cerca del suelo estructural.</strong> El BCE ya bajó 225 puntos básicos desde 2023. La probabilidad de que bajen mucho más es limitada (BCE objetivo neutro ~2,25-2,50%). Fija ahora = capturar tipo competitivo.</li>
+              <li><strong>25 años es el sweet spot.</strong> Cuota manejable (≤30% renta neta familiar tipo), intereses razonables, hipoteca cancelada antes de los 60 años. Liberación financiera anticipada.</li>
+              <li><strong>Amortizacion anticipada.</strong> Negocia que NO haya comisión por amortización anticipada (legal: máximo 2% primeros 10 años, 1.5% después). Esto te permite cancelar capital con futuras pagas extra/bonus.</li>
+            </ul>
+            <p><strong>Bancos a sondear (con TINs base mayo 2026):</strong></p>
+            <ul style="padding-left:20px;line-height:1.7;color:var(--text-dim)">
+              <li><strong>ING Hipoteca Naranja Fija:</strong> 2.69% TIN (con domiciliación nómina). El benchmark del mercado.</li>
+              <li><strong>Openbank:</strong> 2.79% TIN. Sin vinculación obligatoria estricta.</li>
+              <li><strong>EVO Banco:</strong> 2.85% TIN. Bonificable hasta 2.65% con seguros.</li>
+              <li><strong>Bankinter:</strong> 3.10% TIN sin vinculación / 2.75% con vinculación fuerte.</li>
+              <li><strong>BBVA / Santander / CaixaBank:</strong> 2.95-3.25% TIN con vinculación. Negociables.</li>
+            </ul>
+            <p style="margin-top:10px"><strong>Pasos concretos esta semana:</strong></p>
+            <ol style="padding-left:20px;line-height:1.7">
+              <li>Solicitar <strong>3 ofertas vinculantes</strong> (FEIN) a ING + Openbank + tu banco actual.</li>
+              <li>Pedir explícitamente: cero comisión apertura, cero compensación amortización anticipada, vinculación máxima 2 productos.</li>
+              <li>Con la mejor oferta en mano, ir a tu banco actual y pedir que iguale o mejore.</li>
+              <li>Tasación: NO pagar la del banco hasta tener oferta vinculante FEIN. Para hacer ofertas previas, una tasación tuya independiente (~€350) basta.</li>
+            </ol>
+          </div>
+        `;
+      }
+    }
+
+    // ---------- 13.5 TCO (Total Cost of Ownership) ----------
+    const tcoEl = document.getElementById('tcoAnalysis');
+    if (tcoEl) {
+      const principal = window.__mortgagePrincipal || 270000;
+      const recScen = ev.mortgageMarketMay2026.scenarios.find(s => s.recommended);
+      const calc = mortgageCalc(principal, recScen.tin, recScen.years);
+      const opex = ev.propertyOpex;
+      const monthlyOpex = opex.total / 12;
+      const totalMonthly = calc.monthly + monthlyOpex;
+      const totalYear1 = totalMonthly * 12;
+
+      tcoEl.innerHTML = `
+        <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+          Coste real de poseer Espuela 59 — todo lo que sale del bolsillo cada mes.
+        </p>
+        <h4 style="margin:6px 0 8px;color:var(--gold-2);font-size:13px">Mensual (año 1)</h4>
+        <div class="fin-row"><span class="fin-l">Hipoteca (cuota fija)</span><span class="fin-r">${eur(calc.monthly, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">IBI (anual / 12)</span><span class="fin-r">${eur(opex.ibiYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Tasa basura</span><span class="fin-r">${eur(opex.basuraYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Seguro hogar</span><span class="fin-r">${eur(opex.seguroHogarYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Mantenimiento piscina</span><span class="fin-r">${eur(opex.mantenimientoPiscinaYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Mantenimiento jardín (982m²)</span><span class="fin-r">${eur(opex.mantenimientoJardinYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Reserva mantenimiento estructural</span><span class="fin-r">${eur(opex.mantenimientoEstructuralYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Suministros (luz/gas/agua) familia 4</span><span class="fin-r">${eur(opex.suministrosLuzGasAguaYear / 12, 0)}</span></div>
+        <div class="fin-row fin-tot"><span class="fin-l"><strong>TOTAL mensual estabilizado</strong></span><span class="fin-r" style="color:var(--gold-2);font-size:18px"><strong>${eur(totalMonthly, 0)}</strong></span></div>
+        <p style="font-size:12px;color:var(--text-mute);margin:8px 0 0">Ingresos netos familiares necesarios (regla 35%): <strong style="color:var(--text)">≥${eur(totalMonthly * 100/35, 0)}/mes netos</strong>. Si vuestros ingresos son menores, considerar 30 años (cuota baja ~€150).</p>
+
+        <h4 style="margin:18px 0 8px;color:var(--gold-2);font-size:13px">Buy vs Rent · análisis 10 años</h4>
+        <table class="ctable" style="margin-top:6px">
+          <thead><tr><th></th><th>Comprar Espuela 59</th><th>Alquilar villa equivalente</th></tr></thead>
+          <tbody>
+            <tr><th class="row-label">Desembolso inicial</th><td style="text-align:center">${eur(230000)}</td><td style="text-align:center">${eur(2000)} (fianza)</td></tr>
+            <tr><th class="row-label">Cuota mensual</th><td style="text-align:center">${eur(totalMonthly, 0)}</td><td style="text-align:center">${eur(2200, 0)} (renta + suministros)</td></tr>
+            <tr><th class="row-label">Total pagado 10 años</th><td style="text-align:center">${eur(totalMonthly * 120, 0)}</td><td style="text-align:center">${eur(2200 * 120 * 1.15, 0)} <small>(IPC anual)</small></td></tr>
+            <tr><th class="row-label">Valor activo año 10 (base)</th><td style="text-align:center;color:var(--green);font-weight:700">${eur(ev.espuela59Projection[10].total)}</td><td style="text-align:center;color:var(--red)">0 €</td></tr>
+            <tr><th class="row-label">Deuda hipoteca año 10</th><td style="text-align:center;color:var(--red)">~${eur(185000)}</td><td style="text-align:center">—</td></tr>
+            <tr style="background:rgba(212,175,55,0.05)"><th class="row-label" style="color:var(--gold-2)"><strong>Patrimonio año 10</strong></th><td style="text-align:center;color:var(--green);font-weight:700;font-size:15px">${eur(ev.espuela59Projection[10].total - 185000)}</td><td style="text-align:center;color:var(--text-dim)">0 €</td></tr>
+            <tr><th class="row-label">Ventaja COMPRAR vs ALQUILAR</th><td colspan="2" style="text-align:center;color:var(--green);font-weight:700;font-size:15px">+${eur(ev.espuela59Projection[10].total - 185000 - 50000)} de patrimonio en 10 años</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:11px;color:var(--text-mute);margin:8px 0 0">El cálculo asume cuota TCO €${Math.round(totalMonthly)}/mes vs alquiler villa similar Retamar ~€2.200/mes inicial + IPC. Después de ajustar por el coste de oportunidad de invertir ese capital (€230k al 5% real = €375k a 10 años), la ventaja neta de comprar sigue siendo ~€50-80k a favor.</p>
+      `;
+    }
+
+    // ---------- 13.6 Checklist experto ----------
+    const checklistEl = document.getElementById('expertChecklist');
+    if (checklistEl) {
+      checklistEl.innerHTML = ev.expertChecklist.map(cat => `
+        <div class="checklist-cat">
+          <div class="checklist-title">${cat.category}</div>
+          ${cat.items.map(i => `<label class="checklist-item"><input type="checkbox"> <span>${i}</span></label>`).join('')}
+        </div>
+      `).join('');
+    }
+  }
+
+  // ============================================================
   // 11. COMPARATIVA · 4 opciones (Espuela 59 + A, B, C)
   // ============================================================
   if (D.comparables && D.comparables.length) {

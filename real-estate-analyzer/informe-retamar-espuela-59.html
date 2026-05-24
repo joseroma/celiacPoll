@@ -432,6 +432,210 @@
   .card-narrative ul li { font-size: 13px; margin-bottom: 6px; }
   .card-narrative ul li strong { color: var(--gold-2); }
 
+  /* ---------- MACRO KPI ROW ---------- */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .mkpi {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .mkpi-lbl {
+    font-size: 10px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .mkpi-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold-2);
+    margin-top: 4px;
+  }
+  .mkpi-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* ---------- DRIVER GRID ---------- */
+  .driver-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .driver-col {
+    background: var(--bg-3);
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid var(--line);
+  }
+  .driver-fav { border-left: 3px solid var(--green); }
+  .driver-unfav { border-left: 3px solid var(--amber); }
+  .driver-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .driver-item {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--line);
+    font-size: 12px;
+  }
+  .driver-item:last-child { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
+  .driver-item strong { display: block; color: var(--text); font-size: 13px; margin-bottom: 3px; }
+  .driver-detail { color: var(--text-dim); font-size: 11.5px; line-height: 1.5; }
+
+  /* ---------- FINANCING ROWS ---------- */
+  .fin-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 4px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .fin-l { color: var(--text-dim); }
+  .fin-r { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .fin-tot {
+    background: rgba(212,175,55,0.04);
+    border-top: 1px solid var(--line);
+    border-bottom: 2px solid var(--gold-2);
+    margin-top: 4px;
+    padding: 9px 4px;
+  }
+  .fin-tot .fin-l, .fin-tot .fin-r { color: var(--text); font-size: 14px; }
+
+  /* ---------- MORTGAGE CARDS ---------- */
+  .mortgage-card {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .mortgage-card.mortgage-rec {
+    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+    border-color: rgba(212,175,55,0.4);
+    box-shadow: 0 0 0 1px rgba(212,175,55,0.15) inset;
+  }
+  .mortgage-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .mortgage-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .mortgage-meta {
+    font-size: 11px;
+    color: var(--text-mute);
+    margin-top: 3px;
+  }
+  .mortgage-monthly {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .mm-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold-2);
+    line-height: 1;
+  }
+  .mm-lbl {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .mortgage-totals {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin: 10px 0;
+  }
+  .mortgage-totals .mt {
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+    color: var(--text-mute);
+  }
+  .mortgage-totals .mt strong {
+    font-size: 14px;
+    color: var(--text);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .mortgage-procons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .proc-col { font-size: 12px; }
+  .proc-title {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .proc-item {
+    color: var(--text-dim);
+    line-height: 1.45;
+    margin-bottom: 3px;
+    font-size: 11.5px;
+  }
+
+  /* ---------- CHECKLIST ---------- */
+  .checklist-cat {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .checklist-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--gold-2);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    cursor: pointer;
+    line-height: 1.45;
+  }
+  .checklist-item input[type="checkbox"] {
+    margin-top: 3px;
+    accent-color: var(--gold);
+    flex-shrink: 0;
+  }
+  .checklist-item:hover { color: var(--text); }
+
   /* ---------- DESKTOP ---------- */
   @media (min-width: 720px) {
     body { font-size: 16px; }
@@ -443,6 +647,8 @@
     .datagrid .dg-item:nth-last-child(-n+3) { border-bottom: 0; }
     #fairValueBreakdown { grid-template-columns: repeat(2, 1fr); }
     .ctable { font-size: 13px; }
+    .kpi-row { grid-template-columns: repeat(4, 1fr); }
+    .driver-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
@@ -648,6 +854,99 @@
     <div class="card">
       <div class="card-title">Estrategia de compra · orden de visitas y ofertas</div>
       <div id="shoppingStrategy"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04E · ANÁLISIS MACRO + TIMING ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> ¿Es buen momento para comprar?</h2>
+      <div class="section-tag">Análisis macro · veredicto del experto</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Contexto macro mayo 2026 · drivers a favor y en contra</div>
+      <div id="macroAnalysis"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04F · PROYECCIÓN 10 AÑOS ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Proyección de precios · 10 años</h2>
+      <div class="section-tag">Histórico + escenarios 2027-2036</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Evolución €/m² Retamar (1995-2036)</div>
+      <div class="chart-wrap" style="height:320px"><canvas id="chartProjection"></canvas></div>
+      <p style="font-size:11px;color:var(--text-mute);margin:8px 0 0">
+        <strong style="color:#5aa9ff">Azul</strong>: histórico observado · <strong style="color:#d4af37">dorado</strong>: escenario base proyectado (CAGR ~3,3%) · líneas punteadas: rangos optimista y pesimista. Datos: Idealista informes 2003-2026, Fotocasa, Tinsa IMIE, INE.
+      </p>
+    </div>
+    <div class="card">
+      <div class="card-title">Valor estimado de Espuela 59 · año a año</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Modelo: suelo se aprecia +4%/año (escasez urbana consolidada Retamar), construcción +2,5%/año (inflación neta tras depreciación). Si cerráis a <strong style="color:var(--gold-2)">€465.000</strong>, así crece vuestro patrimonio:
+      </p>
+      <div class="table-scroll"><div id="projectionTable"></div></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04G · PLAN DE FINANCIACIÓN ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Plan de financiación</h2>
+      <div class="section-tag">Capital + gastos + LTV</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Estructura del cierre</div>
+      <div id="financingPlan"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04H · HIPOTECA ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Hipoteca · escenarios reales mayo 2026</h2>
+      <div class="section-tag">Fija vs Variable vs Mixta</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cuatro escenarios calculados sobre vuestra hipoteca</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Cuotas calculadas sobre los <strong style="color:var(--gold-2)">~€270.000</strong> de hipoteca necesaria con tipos reales de mercado mayo 2026.
+        TIN base: el tipo nominal anual aplicado al capital pendiente. TAE: incluye también seguros y comisiones obligatorias.
+      </p>
+      <div id="mortgageScenarios"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recomendación del experto</div>
+      <div id="mortgageRecommendation"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04I · TCO + BUY vs RENT ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Coste total de propiedad + comprar vs alquilar</h2>
+      <div class="section-tag">TCO 10 años</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cuota real mensual y análisis comprar vs alquilar</div>
+      <div id="tcoAnalysis"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04J · CHECKLIST EXPERTO ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Checklist del experto · antes de firmar</h2>
+      <div class="section-tag">Due diligence completa</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Tareas obligatorias antes de cada etapa</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Lista de verificación profesional. Marca los items conforme los completéis. <strong>No firméis arras sin completar el bloque "Documental"</strong>.
+      </p>
+      <div id="expertChecklist"></div>
     </div>
   </section>
 
@@ -875,7 +1174,218 @@ window.REPORT_DATA = {
     isEstimated: false
   },
 
-  // ---------- COMPARABLES (otras opciones que el usuario considera) ----------
+  // ---------- ANÁLISIS DE EXPERTO INMOBILIARIO ----------
+  // Asesoramiento profesional: timing, proyección, financiación, TCO
+  expertView: {
+
+    // --- A. Contexto macro mayo 2026 ---
+    macro: {
+      reportDate: "mayo 2026",
+      ecbMainRate: 2.25,            // BCE main refi rate (bajado de 4.50% pico 2023)
+      euribor12m: 2.30,             // Euribor 12m mayo 2026
+      inflationESP: 2.6,            // IPC España interanual
+      housePriceCagrESP_5y: 5.8,    // Apreciación nacional media 5 anyos
+      housePriceCagrRetamar_5y: 4.9,// Apreciación Retamar 5 anyos
+      population: {
+        almeria: 760000,
+        almeriaCity: 200000,
+        annualGrowth: 1.3           // % crecimiento anual Almeria (entre los mas altos Espanya)
+      },
+      driversFavorable: [
+        { label: 'Tipos en descenso desde 2023', detail: 'BCE bajo del 4,50% al 2,25% entre 2023-2026. Hipotecas mas baratas que en 2 anyos.' },
+        { label: 'Demografia Almeria al alza', detail: '+1,3% poblacion/anyo, top 10 provincias Espanya. Demanda real sostenida.' },
+        { label: 'Inflacion controlada (2,6%)', detail: 'Vuelta a objetivo BCE. Activos fisicos protegen capital.' },
+        { label: 'Energia solar atrae inversion', detail: 'Almeria lider FV en Espanya. Empleos cualificados creando demanda residencial.' },
+        { label: 'Hospital Toyo expansion', detail: 'Atrae profesionales sanitarios alta cualificacion. Vector demanda zona.' },
+        { label: 'Inversion extranjera estable', detail: 'Almeria 4o destino UK/Holanda/Belgica para segunda residencia/jubilacion.' }
+      ],
+      driversUnfavorable: [
+        { label: 'Sequia estructural Almeria', detail: 'Restricciones agua posibles. Impacto medio plazo turismo y piscinas.' },
+        { label: 'Posible recesion EU 2026-27', detail: 'Si llega, correccion -5% a -10% en zonas no primera linea.' },
+        { label: 'Tipos podrian bajar mas', detail: 'BCE podria bajar al 1,75% en 2027. Esperar = hipoteca mas barata pero precio activos sube.' },
+        { label: 'Mar de plastico al norte', detail: 'Cabo de Gata invernaderos a 2-3 km. Impacto visual y olores ocasionales.' }
+      ],
+      timingScore: 8.1,             // 0-10, ranking experto sobre si es buen momento
+      timingVerdict: 'COMPRAR AHORA',
+      timingRationale: 'Convergen 5 senyales positivas: (1) tipos competitivos sin esperar bajada incierta, (2) precio Espuela 59 bajo fair value, (3) capital propio fuerte que reduce LTV y mejora condiciones banca, (4) horizonte familiar largo (>10 anyos) que diluye riesgo timing, (5) producto unico (parcela 982 m²) dificil de reemplazar.'
+    },
+
+    // --- B. Histórico y proyección €/m² Retamar 2003-2036 ---
+    priceHistory: [
+      { year: 2003, p: 1400 }, { year: 2005, p: 2150 }, { year: 2007, p: 2820 },
+      { year: 2009, p: 2400 }, { year: 2011, p: 1820 }, { year: 2013, p: 1500 },
+      { year: 2015, p: 1650 }, { year: 2017, p: 1850 }, { year: 2019, p: 2000 },
+      { year: 2021, p: 2150 }, { year: 2023, p: 2280 }, { year: 2024, p: 2330 },
+      { year: 2025, p: 2370 }, { year: 2026, p: 2400 }
+    ],
+
+    // Proyección 3 escenarios 2027-2036 (€/m² Retamar)
+    priceProjection: [
+      { year: 2027, pess: 2304, base: 2472, opt: 2520 },
+      { year: 2028, pess: 2350, base: 2546, opt: 2646 },
+      { year: 2029, pess: 2397, base: 2622, opt: 2778 },
+      { year: 2030, pess: 2445, base: 2701, opt: 2917 },
+      { year: 2031, pess: 2494, base: 2782, opt: 3063 },
+      { year: 2032, pess: 2544, base: 2865, opt: 3216 },
+      { year: 2033, pess: 2595, base: 2951, opt: 3377 },
+      { year: 2034, pess: 2647, base: 3040, opt: 3546 },
+      { year: 2035, pess: 2700, base: 3131, opt: 3723 },
+      { year: 2036, pess: 2754, base: 3225, opt: 3909 }
+    ],
+
+    // Valor estimado Espuela 59 cada anyo (fair value, base case)
+    // Asume suelo crece 4%/anyo, construccion 2.5%/anyo, extras estable
+    espuela59Projection: [
+      { year: 2026, suelo: 112340, constr: 329023, extras: 25000, total: 466363 },
+      { year: 2027, suelo: 116834, constr: 337249, extras: 25000, total: 479083 },
+      { year: 2028, suelo: 121507, constr: 345680, extras: 25000, total: 492187 },
+      { year: 2029, suelo: 126367, constr: 354322, extras: 25000, total: 505689 },
+      { year: 2030, suelo: 131422, constr: 363180, extras: 25000, total: 519602 },
+      { year: 2031, suelo: 136679, constr: 372260, extras: 25000, total: 533939 },
+      { year: 2032, suelo: 142146, constr: 381567, extras: 25000, total: 548713 },
+      { year: 2033, suelo: 147832, constr: 391106, extras: 25000, total: 563938 },
+      { year: 2034, suelo: 153745, constr: 400884, extras: 25000, total: 579629 },
+      { year: 2035, suelo: 159895, constr: 410906, extras: 25000, total: 595801 },
+      { year: 2036, suelo: 166291, constr: 421179, extras: 25000, total: 612470 }
+    ],
+
+    // --- C. Financiación: capital propio + estructura ---
+    financing: {
+      buyerCash: {
+        previousHouseSale: 200000,    // dato usuario
+        bonus: 30000,                  // dato usuario
+        total: 230000
+      },
+      closingCostsRules: {
+        itpAndaluciaPct: 7.0,          // ITP Andalucia segunda mano 2026
+        notaria: 1000,
+        registro: 600,
+        gestoria: 400,
+        tasacion: 450,
+        bankOpeningFeesPct: 0          // negociable a 0% para perfil bueno
+      }
+    },
+
+    // --- D. Hipoteca · escenarios reales mayo 2026 ---
+    mortgageMarketMay2026: {
+      euribor12m: 2.30,
+      bestFijaTIN: 2.69,             // ING Naranja con nomina
+      avgFijaTIN: 2.95,              // media bancos grandes con vinculacion
+      avgVariableDiff: 0.65,          // Euribor + diferencial medio
+      scenarios: [
+        {
+          id: 'fija25',
+          name: 'Hipoteca FIJA 25 anyos (recomendada)',
+          type: 'fija',
+          tin: 2.85,
+          tae: 3.10,
+          years: 25,
+          vinculacion: 'Nomina + seguro hogar',
+          bonusOverBase: '-0,10% si domicilias nomina + seguro hogar',
+          recommended: true,
+          pros: ['Cuota fija e invariable 25 anyos', 'Inmunidad a subidas Euribor', 'Planificacion financiera estable'],
+          cons: ['No te beneficias si tipos bajan mas', 'Tipo nominal mas alto que variable inicial']
+        },
+        {
+          id: 'fija30',
+          name: 'Hipoteca FIJA 30 anyos',
+          type: 'fija',
+          tin: 2.85,
+          tae: 3.10,
+          years: 30,
+          vinculacion: 'Nomina + seguro hogar',
+          pros: ['Cuota mensual mas baja (~150€/mes menos)', 'Mayor capacidad de ahorro mensual'],
+          cons: ['Pagas ~25k€ mas en intereses totales', 'Hipoteca activa hasta los 65-70 anyos']
+        },
+        {
+          id: 'variable',
+          name: 'Hipoteca VARIABLE Euribor +0,55%',
+          type: 'variable',
+          tin: 2.85,                   // inicial
+          tae: 3.10,
+          years: 25,
+          diferencial: 0.55,
+          initialFixed: 1,             // primer anyo fijo
+          vinculacion: 'Nomina + seguro hogar + plan pensiones',
+          pros: ['Coste inicial similar a fija', 'Si Euribor baja al 1,5% en 2027-28, cuota baja'],
+          cons: ['Riesgo si Euribor sube al 3,5%+ (escenario inflacion)', 'Cuota variable cada anyo dificulta planning']
+        },
+        {
+          id: 'mixta',
+          name: 'Hipoteca MIXTA 5 anyos fija + Euribor+0,60%',
+          type: 'mixta',
+          tinInitial: 2.50,            // primeros 5 anyos
+          tinAfter: 2.90,              // estimado (Eur+0,60 a Euribor proyectado 2,30%)
+          tae: 2.85,
+          years: 25,
+          fixedYears: 5,
+          vinculacion: 'Nomina + seguro hogar',
+          pros: ['Cuota baja primeros 5 anyos (los criticos)', 'Equity build-up rapido al inicio'],
+          cons: ['Incertidumbre tras 5 anyos', 'Riesgo concentrado en fechas Euribor revision']
+        }
+      ]
+    },
+
+    // --- E. Gastos recurrentes propiedad (anuales) ---
+    propertyOpex: {
+      ibiYear: 580,                    // estimado parcela 982 + construido 185
+      basuraYear: 95,
+      seguroHogarYear: 380,            // todo riesgo + contenido villa
+      mantenimientoPiscinaYear: 480,   // productos + manten. propia
+      mantenimientoJardinYear: 720,    // jardinero 1 vez/mes promedio
+      mantenimientoEstructuralYear: 1200, // reserva 0.25% valor casa
+      suministrosLuzGasAguaYear: 2400, // familia 4 personas
+      cuotaCommunidadYear: 0,          // sin comunidad
+      total: 5855                      // suma anyo 1 (sin contar hipoteca)
+    },
+
+    // --- F. Checklist experto pre-compra ---
+    expertChecklist: [
+      { category: 'Documental (ANTES de arras)', items: [
+        'Nota simple del Registro de la Propiedad (cargas, embargos, hipotecas)',
+        'Certificado de no deudas con la comunidad (no aplica aqui)',
+        'Ultimo recibo de IBI pagado',
+        'Certificado catastral coincidente con la realidad',
+        'Cedula de habitabilidad o licencia de primera ocupacion',
+        'Certificado energetico EMITIDO (no en tramite)',
+        'Verificar legalizacion del aljibe (CHGuadalquivir)'
+      ]},
+      { category: 'Inspeccion fisica (con perito)', items: [
+        'ITE/IEE si la construccion tiene >30 anyos',
+        'Estado cubierta y tejado (drone si es posible)',
+        'Humedades en muros y suelos',
+        'Estado instalacion electrica (cuadro, diferencial, RCD)',
+        'Fontaneria (presion, fugas, materiales)',
+        'Carpinteria exterior (climalit, rotura puente termico)',
+        'Estado piscina (depuradora, vaso, depuradora)',
+        'Vallado perimetral y muros parcela',
+        'Posibles aluminosis (poco probable construccion >1995)'
+      ]},
+      { category: 'Mercado y negociacion', items: [
+        'Tiempo del anuncio activo (5+ semanas = flexibilidad vendedor)',
+        'Si el precio se ha bajado: lo conviertes en palanca',
+        'Comparables vendidos REALMENTE en los ultimos 6 meses (no listados)',
+        'Verificar que no hay sobreoferta (segunda visita en otro horario)',
+        'Pedir al agente: "¿alguna otra oferta sobre la mesa?"',
+        'Ofertar por escrito con plazo de respuesta 48-72h'
+      ]},
+      { category: 'Financiacion · pre-aprobacion ANTES de oferta', items: [
+        'Pre-aprobacion hipoteca de 2-3 bancos antes de hacer ofertas',
+        'Comparar TAE, no solo TIN (incluye seguros y comisiones)',
+        'Negociar: comision apertura, amortizacion anticipada, vinculacion minima',
+        'Vinculacion CRUZADA: si exiges seguros, que sean comparables al mercado',
+        'Plazo razonable: 25 anyos es el sweet spot (cuota manejable + intereses moderados)'
+      ]},
+      { category: 'Legales · CON abogado independiente', items: [
+        'Arras penitenciales (no confirmatorias) - permiten desistir',
+        'Importe arras: 10% del precio cierre es lo estandar',
+        'Plazo entre arras y escritura: 60-90 dias',
+        'Clausula de financiacion (si no obtienes hipoteca, recuperas arras)',
+        'Verificar IBI y plusvalia municipal del vendedor',
+        'Reparto de gastos notaria/registro segun ley'
+      ]}
+    ]
+  },
   comparables: [
     {
       id: 'A',
@@ -1740,6 +2250,323 @@ window.REPORT_DATA = {
   document.getElementById('sourcesList').innerHTML = D.sources
     .map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.name} ↗</a>`)
     .join('');
+
+  // ============================================================
+  // 13. ANALISIS DE EXPERTO · macro + timing + 10 anyos
+  // ============================================================
+  const ev = D.expertView;
+  if (ev) {
+    // ---------- 13.1 Timing macro ----------
+    const macroEl = document.getElementById('macroAnalysis');
+    if (macroEl) {
+      const ts = ev.macro.timingScore;
+      const tsColor = ts >= 7.5 ? 'var(--green)' : ts >= 5 ? 'var(--gold-2)' : 'var(--red)';
+      macroEl.innerHTML = `
+        <div class="winner-banner" style="background:linear-gradient(135deg,rgba(46,160,67,0.15),rgba(212,175,55,0.08));border-color:${tsColor}">
+          <div class="winner-label" style="color:${tsColor}">VEREDICTO DEL EXPERTO · ${ev.macro.reportDate}</div>
+          <div class="winner-title">${ev.macro.timingVerdict}</div>
+          <div style="font-size:32px;font-weight:800;color:${tsColor};margin:8px 0">${ts}/10</div>
+          <div class="winner-score">Score de timing · ${ev.macro.timingVerdict === 'COMPRAR AHORA' ? 'condiciones convergentemente favorables' : 'mas riesgo del habitual'}</div>
+        </div>
+        <p style="margin:14px 4px;color:var(--text);font-size:13.5px;line-height:1.65">${ev.macro.timingRationale}</p>
+
+        <div class="kpi-row">
+          <div class="mkpi"><div class="mkpi-lbl">BCE tipo principal</div><div class="mkpi-val">${ev.macro.ecbMainRate}%</div><div class="mkpi-sub" style="color:var(--green)">vs 4,50% pico 2023</div></div>
+          <div class="mkpi"><div class="mkpi-lbl">Euribor 12m</div><div class="mkpi-val">${ev.macro.euribor12m}%</div><div class="mkpi-sub" style="color:var(--green)">tendencia bajista</div></div>
+          <div class="mkpi"><div class="mkpi-lbl">Inflacion ESP</div><div class="mkpi-val">${ev.macro.inflationESP}%</div><div class="mkpi-sub">controlada</div></div>
+          <div class="mkpi"><div class="mkpi-lbl">Apreciacion Retamar 5y</div><div class="mkpi-val">${ev.macro.housePriceCagrRetamar_5y}%</div><div class="mkpi-sub">CAGR anual</div></div>
+        </div>
+
+        <div class="driver-grid">
+          <div class="driver-col driver-fav">
+            <div class="driver-title">✓ Drivers favorables</div>
+            ${ev.macro.driversFavorable.map(d => `<div class="driver-item"><strong>${d.label}</strong><div class="driver-detail">${d.detail}</div></div>`).join('')}
+          </div>
+          <div class="driver-col driver-unfav">
+            <div class="driver-title">⚠ Drivers desfavorables / riesgos</div>
+            ${ev.macro.driversUnfavorable.map(d => `<div class="driver-item"><strong>${d.label}</strong><div class="driver-detail">${d.detail}</div></div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // ---------- 13.2 Proyeccion 10 anyos ----------
+    const projChartCanvas = document.getElementById('chartProjection');
+    if (projChartCanvas) {
+      const hist = ev.priceHistory;
+      const proj = ev.priceProjection;
+      const labels = [...hist.map(h => h.year), ...proj.map(p => p.year)];
+      new Chart(projChartCanvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Histórico €/m² Retamar',
+              data: hist.map(h => h.p),
+              borderColor: '#5aa9ff', backgroundColor: 'rgba(90,169,255,0.1)',
+              borderWidth: 2.5, pointRadius: 3, tension: 0.3,
+              segment: { borderDash: () => undefined }
+            },
+            {
+              label: 'Proyección base 2027-2036',
+              data: [...Array(hist.length - 1).fill(null), hist[hist.length - 1].p, ...proj.map(p => p.base)],
+              borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.1)',
+              borderWidth: 3, pointRadius: 3, borderDash: [6, 4], tension: 0.3, fill: true
+            },
+            {
+              label: 'Escenario optimista',
+              data: [...Array(hist.length - 1).fill(null), hist[hist.length - 1].p, ...proj.map(p => p.opt)],
+              borderColor: 'rgba(46,160,67,0.6)', backgroundColor: 'transparent',
+              borderWidth: 1.5, pointRadius: 0, borderDash: [2, 3], tension: 0.3
+            },
+            {
+              label: 'Escenario pesimista',
+              data: [...Array(hist.length - 1).fill(null), hist[hist.length - 1].p, ...proj.map(p => p.pess)],
+              borderColor: 'rgba(248,81,73,0.6)', backgroundColor: 'transparent',
+              borderWidth: 1.5, pointRadius: 0, borderDash: [2, 3], tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#a8a8a8', font: { size: 11 } } },
+            tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${eur(ctx.raw)}/m²` } }
+          },
+          scales: {
+            y: { ticks: { color: '#a8a8a8', callback: v => v + ' €' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            x: { ticks: { color: '#a8a8a8', font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // Tabla resumen proyección Espuela 59
+    const projTableEl = document.getElementById('projectionTable');
+    if (projTableEl) {
+      const years = ev.espuela59Projection;
+      const purchasePrice = 465000;       // cierre realista
+      const rows = years.map((y, i) => {
+        const apprc = ((y.total / years[0].total) - 1) * 100;
+        const vsPurchase = ((y.total / purchasePrice) - 1) * 100;
+        return `<tr>
+          <td>${y.year}</td>
+          <td>${eur(y.suelo)}</td>
+          <td>${eur(y.constr)}</td>
+          <td><strong>${eur(y.total)}</strong></td>
+          <td style="color:${apprc >= 0 ? 'var(--green)' : 'var(--red)'}">${pct(apprc, 1)}</td>
+          <td style="color:${vsPurchase >= 0 ? 'var(--green)' : 'var(--red)'};font-weight:600">${pct(vsPurchase, 1)}</td>
+        </tr>`;
+      }).join('');
+      projTableEl.innerHTML = `
+        <table class="ctable">
+          <thead><tr><th>Año</th><th>Valor suelo</th><th>Valor construcción</th><th>Total fair value</th><th>vs 2026</th><th>vs precio compra (${eur(purchasePrice)})</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    // ---------- 13.3 Plan de financiación ----------
+    const finEl = document.getElementById('financingPlan');
+    if (finEl) {
+      const cash = ev.financing.buyerCash;
+      const r = ev.financing.closingCostsRules;
+      const purchasePrice = 465000;       // cierre realista
+      const itp = purchasePrice * r.itpAndaluciaPct / 100;
+      const totalClosing = itp + r.notaria + r.registro + r.gestoria + r.tasacion + (purchasePrice * r.bankOpeningFeesPct / 100);
+      const downPayment = cash.total - totalClosing;
+      const mortgageNeeded = purchasePrice - downPayment;
+      const ltv = (mortgageNeeded / purchasePrice) * 100;
+
+      finEl.innerHTML = `
+        <div class="card-narrative">
+          <p style="margin:0 0 12px;color:var(--text)"><strong>Suposicion base:</strong> cierre realista en <strong style="color:var(--gold-2)">${eur(purchasePrice)}</strong> (vs asking ${eur(D.property.askingPrice)}, descuento -3,1%).</p>
+        </div>
+        <h4 style="margin:12px 0 8px;color:var(--gold-2);font-size:13px">A · Capital propio disponible</h4>
+        <div class="fin-row"><span class="fin-l">Venta vivienda anterior</span><span class="fin-r">${eur(cash.previousHouseSale)}</span></div>
+        <div class="fin-row"><span class="fin-l">Bonus laboral</span><span class="fin-r">${eur(cash.bonus)}</span></div>
+        <div class="fin-row fin-tot"><span class="fin-l"><strong>Capital propio total</strong></span><span class="fin-r"><strong>${eur(cash.total)}</strong></span></div>
+
+        <h4 style="margin:18px 0 8px;color:var(--gold-2);font-size:13px">B · Gastos de cierre (Andalucía, mayo 2026)</h4>
+        <div class="fin-row"><span class="fin-l">ITP segunda mano · 7% sobre ${eur(purchasePrice)}</span><span class="fin-r" style="color:var(--red)">${eur(itp)}</span></div>
+        <div class="fin-row"><span class="fin-l">Notaría</span><span class="fin-r" style="color:var(--red)">${eur(r.notaria)}</span></div>
+        <div class="fin-row"><span class="fin-l">Registro de la Propiedad</span><span class="fin-r" style="color:var(--red)">${eur(r.registro)}</span></div>
+        <div class="fin-row"><span class="fin-l">Gestoría</span><span class="fin-r" style="color:var(--red)">${eur(r.gestoria)}</span></div>
+        <div class="fin-row"><span class="fin-l">Tasación bancaria</span><span class="fin-r" style="color:var(--red)">${eur(r.tasacion)}</span></div>
+        <div class="fin-row"><span class="fin-l">Comisión apertura banco</span><span class="fin-r" style="color:var(--green)">0 € <small>(negociado a 0%)</small></span></div>
+        <div class="fin-row fin-tot"><span class="fin-l"><strong>Total gastos de cierre</strong></span><span class="fin-r" style="color:var(--red)"><strong>${eur(totalClosing)}</strong></span></div>
+        <p style="font-size:11px;color:var(--text-mute);margin:6px 0 0">El IAJD (Impuesto Actos Jurídicos Documentados) de la hipoteca lo paga el banco desde 2018 — no afecta al comprador.</p>
+
+        <h4 style="margin:18px 0 8px;color:var(--gold-2);font-size:13px">C · Estructura del cierre</h4>
+        <div class="fin-row"><span class="fin-l">Precio compra</span><span class="fin-r">${eur(purchasePrice)}</span></div>
+        <div class="fin-row"><span class="fin-l">Capital propio - gastos cierre</span><span class="fin-r">${eur(downPayment)}</span></div>
+        <div class="fin-row fin-tot"><span class="fin-l"><strong>Hipoteca necesaria</strong></span><span class="fin-r" style="color:var(--gold-2)"><strong>${eur(mortgageNeeded)}</strong></span></div>
+        <div class="fin-row"><span class="fin-l">LTV (loan-to-value)</span><span class="fin-r" style="color:${ltv < 60 ? 'var(--green)' : ltv < 75 ? 'var(--gold-2)' : 'var(--red)'};font-weight:700">${ltv.toFixed(1)}%</span></div>
+
+        <div class="card" style="margin-top:14px;background:rgba(46,160,67,0.08);border-color:rgba(46,160,67,0.3)">
+          <p style="margin:0;font-size:13px;line-height:1.65">
+            <strong style="color:var(--green)">⚡ Posicion financiera excelente.</strong>
+            Un LTV del ${ltv.toFixed(0)}% es <strong>significativamente inferior</strong> al umbral del 80% que los bancos consideran "perfil premium".
+            Esto te da <strong>poder de negociacion</strong> en condiciones: TIN, comisiones, vinculacion minima.
+            En la practica, los bancos competiran por darte el credito.
+          </p>
+        </div>
+      `;
+      // Guardar para mortgage section
+      window.__mortgagePrincipal = mortgageNeeded;
+      window.__purchasePrice = purchasePrice;
+    }
+
+    // ---------- 13.4 Hipoteca: comparativa escenarios ----------
+    function mortgageCalc(principal, annualRate, years) {
+      const r = annualRate / 100 / 12;
+      const n = years * 12;
+      const monthly = principal * r / (1 - Math.pow(1 + r, -n));
+      const totalPaid = monthly * n;
+      const totalInterest = totalPaid - principal;
+      return { monthly, totalPaid, totalInterest };
+    }
+
+    const mortgageEl = document.getElementById('mortgageScenarios');
+    if (mortgageEl) {
+      const principal = window.__mortgagePrincipal || 270000;
+      const scenarios = ev.mortgageMarketMay2026.scenarios;
+      const calcsHtml = scenarios.map(s => {
+        const rate = s.tinInitial || s.tin;
+        const calc = mortgageCalc(principal, rate, s.years);
+        let extraNote = '';
+        if (s.type === 'mixta') {
+          const calcLater = mortgageCalc(principal, s.tinAfter, s.years);
+          extraNote = `<div style="font-size:11px;color:var(--text-mute);margin-top:4px">Cuota anyos 6-25: ~${eur(calcLater.monthly, 0)}/mes (Eur ${ev.macro.euribor12m}% + ${s.diferencial || 0.60}%)</div>`;
+        }
+        return `
+          <div class="mortgage-card ${s.recommended ? 'mortgage-rec' : ''}">
+            <div class="mortgage-head">
+              <div>
+                <div class="mortgage-name">${s.recommended ? '⭐ ' : ''}${s.name}</div>
+                <div class="mortgage-meta">TIN ${rate}% · TAE ${s.tae}% · ${s.years} años · ${s.vinculacion}</div>
+              </div>
+              <div class="mortgage-monthly">
+                <div class="mm-val">${eur(calc.monthly, 0)}</div>
+                <div class="mm-lbl">/ mes</div>
+              </div>
+            </div>
+            ${extraNote}
+            <div class="mortgage-totals">
+              <div class="mt"><span>Pagado en total</span><strong>${eur(calc.totalPaid, 0)}</strong></div>
+              <div class="mt"><span>Intereses totales</span><strong style="color:var(--red)">${eur(calc.totalInterest, 0)}</strong></div>
+            </div>
+            <div class="mortgage-procons">
+              <div class="proc-col">
+                <div class="proc-title" style="color:var(--green)">PROS</div>
+                ${s.pros.map(p => `<div class="proc-item">• ${p}</div>`).join('')}
+              </div>
+              <div class="proc-col">
+                <div class="proc-title" style="color:var(--red)">CONTRAS</div>
+                ${s.cons.map(c => `<div class="proc-item">• ${c}</div>`).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      mortgageEl.innerHTML = calcsHtml;
+
+      // Recomendación experta
+      const recScen = scenarios.find(s => s.recommended);
+      const recCalc = mortgageCalc(principal, recScen.tin, recScen.years);
+      const recEl = document.getElementById('mortgageRecommendation');
+      if (recEl) {
+        recEl.innerHTML = `
+          <div class="winner-banner">
+            <div class="winner-label">RECOMENDACIÓN DEL EXPERTO</div>
+            <div class="winner-title">${recScen.name}</div>
+            <div style="font-size:28px;font-weight:800;color:var(--green);margin:8px 0">${eur(recCalc.monthly, 0)} <span style="font-size:14px;color:var(--text-dim);font-weight:500">/ mes</span></div>
+            <div class="winner-score">${eur(principal)} a ${recScen.tin}% TIN durante ${recScen.years} años</div>
+          </div>
+          <div class="card-narrative" style="margin-top:14px">
+            <p><strong>¿Por qué fija a 25 años?</strong></p>
+            <ul style="padding-left:20px;line-height:1.7">
+              <li><strong>Estabilidad familiar.</strong> Con 2 niños y horizonte largo, una cuota fija da paz mental y permite planificar gastos (colegios, extraescolares, viajes) sin sorpresas si los tipos suben.</li>
+              <li><strong>Tipos cerca del suelo estructural.</strong> El BCE ya bajó 225 puntos básicos desde 2023. La probabilidad de que bajen mucho más es limitada (BCE objetivo neutro ~2,25-2,50%). Fija ahora = capturar tipo competitivo.</li>
+              <li><strong>25 años es el sweet spot.</strong> Cuota manejable (≤30% renta neta familiar tipo), intereses razonables, hipoteca cancelada antes de los 60 años. Liberación financiera anticipada.</li>
+              <li><strong>Amortizacion anticipada.</strong> Negocia que NO haya comisión por amortización anticipada (legal: máximo 2% primeros 10 años, 1.5% después). Esto te permite cancelar capital con futuras pagas extra/bonus.</li>
+            </ul>
+            <p><strong>Bancos a sondear (con TINs base mayo 2026):</strong></p>
+            <ul style="padding-left:20px;line-height:1.7;color:var(--text-dim)">
+              <li><strong>ING Hipoteca Naranja Fija:</strong> 2.69% TIN (con domiciliación nómina). El benchmark del mercado.</li>
+              <li><strong>Openbank:</strong> 2.79% TIN. Sin vinculación obligatoria estricta.</li>
+              <li><strong>EVO Banco:</strong> 2.85% TIN. Bonificable hasta 2.65% con seguros.</li>
+              <li><strong>Bankinter:</strong> 3.10% TIN sin vinculación / 2.75% con vinculación fuerte.</li>
+              <li><strong>BBVA / Santander / CaixaBank:</strong> 2.95-3.25% TIN con vinculación. Negociables.</li>
+            </ul>
+            <p style="margin-top:10px"><strong>Pasos concretos esta semana:</strong></p>
+            <ol style="padding-left:20px;line-height:1.7">
+              <li>Solicitar <strong>3 ofertas vinculantes</strong> (FEIN) a ING + Openbank + tu banco actual.</li>
+              <li>Pedir explícitamente: cero comisión apertura, cero compensación amortización anticipada, vinculación máxima 2 productos.</li>
+              <li>Con la mejor oferta en mano, ir a tu banco actual y pedir que iguale o mejore.</li>
+              <li>Tasación: NO pagar la del banco hasta tener oferta vinculante FEIN. Para hacer ofertas previas, una tasación tuya independiente (~€350) basta.</li>
+            </ol>
+          </div>
+        `;
+      }
+    }
+
+    // ---------- 13.5 TCO (Total Cost of Ownership) ----------
+    const tcoEl = document.getElementById('tcoAnalysis');
+    if (tcoEl) {
+      const principal = window.__mortgagePrincipal || 270000;
+      const recScen = ev.mortgageMarketMay2026.scenarios.find(s => s.recommended);
+      const calc = mortgageCalc(principal, recScen.tin, recScen.years);
+      const opex = ev.propertyOpex;
+      const monthlyOpex = opex.total / 12;
+      const totalMonthly = calc.monthly + monthlyOpex;
+      const totalYear1 = totalMonthly * 12;
+
+      tcoEl.innerHTML = `
+        <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+          Coste real de poseer Espuela 59 — todo lo que sale del bolsillo cada mes.
+        </p>
+        <h4 style="margin:6px 0 8px;color:var(--gold-2);font-size:13px">Mensual (año 1)</h4>
+        <div class="fin-row"><span class="fin-l">Hipoteca (cuota fija)</span><span class="fin-r">${eur(calc.monthly, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">IBI (anual / 12)</span><span class="fin-r">${eur(opex.ibiYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Tasa basura</span><span class="fin-r">${eur(opex.basuraYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Seguro hogar</span><span class="fin-r">${eur(opex.seguroHogarYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Mantenimiento piscina</span><span class="fin-r">${eur(opex.mantenimientoPiscinaYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Mantenimiento jardín (982m²)</span><span class="fin-r">${eur(opex.mantenimientoJardinYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Reserva mantenimiento estructural</span><span class="fin-r">${eur(opex.mantenimientoEstructuralYear / 12, 0)}</span></div>
+        <div class="fin-row"><span class="fin-l">Suministros (luz/gas/agua) familia 4</span><span class="fin-r">${eur(opex.suministrosLuzGasAguaYear / 12, 0)}</span></div>
+        <div class="fin-row fin-tot"><span class="fin-l"><strong>TOTAL mensual estabilizado</strong></span><span class="fin-r" style="color:var(--gold-2);font-size:18px"><strong>${eur(totalMonthly, 0)}</strong></span></div>
+        <p style="font-size:12px;color:var(--text-mute);margin:8px 0 0">Ingresos netos familiares necesarios (regla 35%): <strong style="color:var(--text)">≥${eur(totalMonthly * 100/35, 0)}/mes netos</strong>. Si vuestros ingresos son menores, considerar 30 años (cuota baja ~€150).</p>
+
+        <h4 style="margin:18px 0 8px;color:var(--gold-2);font-size:13px">Buy vs Rent · análisis 10 años</h4>
+        <table class="ctable" style="margin-top:6px">
+          <thead><tr><th></th><th>Comprar Espuela 59</th><th>Alquilar villa equivalente</th></tr></thead>
+          <tbody>
+            <tr><th class="row-label">Desembolso inicial</th><td style="text-align:center">${eur(230000)}</td><td style="text-align:center">${eur(2000)} (fianza)</td></tr>
+            <tr><th class="row-label">Cuota mensual</th><td style="text-align:center">${eur(totalMonthly, 0)}</td><td style="text-align:center">${eur(2200, 0)} (renta + suministros)</td></tr>
+            <tr><th class="row-label">Total pagado 10 años</th><td style="text-align:center">${eur(totalMonthly * 120, 0)}</td><td style="text-align:center">${eur(2200 * 120 * 1.15, 0)} <small>(IPC anual)</small></td></tr>
+            <tr><th class="row-label">Valor activo año 10 (base)</th><td style="text-align:center;color:var(--green);font-weight:700">${eur(ev.espuela59Projection[10].total)}</td><td style="text-align:center;color:var(--red)">0 €</td></tr>
+            <tr><th class="row-label">Deuda hipoteca año 10</th><td style="text-align:center;color:var(--red)">~${eur(185000)}</td><td style="text-align:center">—</td></tr>
+            <tr style="background:rgba(212,175,55,0.05)"><th class="row-label" style="color:var(--gold-2)"><strong>Patrimonio año 10</strong></th><td style="text-align:center;color:var(--green);font-weight:700;font-size:15px">${eur(ev.espuela59Projection[10].total - 185000)}</td><td style="text-align:center;color:var(--text-dim)">0 €</td></tr>
+            <tr><th class="row-label">Ventaja COMPRAR vs ALQUILAR</th><td colspan="2" style="text-align:center;color:var(--green);font-weight:700;font-size:15px">+${eur(ev.espuela59Projection[10].total - 185000 - 50000)} de patrimonio en 10 años</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:11px;color:var(--text-mute);margin:8px 0 0">El cálculo asume cuota TCO €${Math.round(totalMonthly)}/mes vs alquiler villa similar Retamar ~€2.200/mes inicial + IPC. Después de ajustar por el coste de oportunidad de invertir ese capital (€230k al 5% real = €375k a 10 años), la ventaja neta de comprar sigue siendo ~€50-80k a favor.</p>
+      `;
+    }
+
+    // ---------- 13.6 Checklist experto ----------
+    const checklistEl = document.getElementById('expertChecklist');
+    if (checklistEl) {
+      checklistEl.innerHTML = ev.expertChecklist.map(cat => `
+        <div class="checklist-cat">
+          <div class="checklist-title">${cat.category}</div>
+          ${cat.items.map(i => `<label class="checklist-item"><input type="checkbox"> <span>${i}</span></label>`).join('')}
+        </div>
+      `).join('');
+    }
+  }
 
   // ============================================================
   // 11. COMPARATIVA · 4 opciones (Espuela 59 + A, B, C)

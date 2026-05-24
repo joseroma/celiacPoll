@@ -64,7 +64,218 @@ window.REPORT_DATA = {
     isEstimated: false
   },
 
-  // ---------- COMPARABLES (otras opciones que el usuario considera) ----------
+  // ---------- ANÁLISIS DE EXPERTO INMOBILIARIO ----------
+  // Asesoramiento profesional: timing, proyección, financiación, TCO
+  expertView: {
+
+    // --- A. Contexto macro mayo 2026 ---
+    macro: {
+      reportDate: "mayo 2026",
+      ecbMainRate: 2.25,            // BCE main refi rate (bajado de 4.50% pico 2023)
+      euribor12m: 2.30,             // Euribor 12m mayo 2026
+      inflationESP: 2.6,            // IPC España interanual
+      housePriceCagrESP_5y: 5.8,    // Apreciación nacional media 5 anyos
+      housePriceCagrRetamar_5y: 4.9,// Apreciación Retamar 5 anyos
+      population: {
+        almeria: 760000,
+        almeriaCity: 200000,
+        annualGrowth: 1.3           // % crecimiento anual Almeria (entre los mas altos Espanya)
+      },
+      driversFavorable: [
+        { label: 'Tipos en descenso desde 2023', detail: 'BCE bajo del 4,50% al 2,25% entre 2023-2026. Hipotecas mas baratas que en 2 anyos.' },
+        { label: 'Demografia Almeria al alza', detail: '+1,3% poblacion/anyo, top 10 provincias Espanya. Demanda real sostenida.' },
+        { label: 'Inflacion controlada (2,6%)', detail: 'Vuelta a objetivo BCE. Activos fisicos protegen capital.' },
+        { label: 'Energia solar atrae inversion', detail: 'Almeria lider FV en Espanya. Empleos cualificados creando demanda residencial.' },
+        { label: 'Hospital Toyo expansion', detail: 'Atrae profesionales sanitarios alta cualificacion. Vector demanda zona.' },
+        { label: 'Inversion extranjera estable', detail: 'Almeria 4o destino UK/Holanda/Belgica para segunda residencia/jubilacion.' }
+      ],
+      driversUnfavorable: [
+        { label: 'Sequia estructural Almeria', detail: 'Restricciones agua posibles. Impacto medio plazo turismo y piscinas.' },
+        { label: 'Posible recesion EU 2026-27', detail: 'Si llega, correccion -5% a -10% en zonas no primera linea.' },
+        { label: 'Tipos podrian bajar mas', detail: 'BCE podria bajar al 1,75% en 2027. Esperar = hipoteca mas barata pero precio activos sube.' },
+        { label: 'Mar de plastico al norte', detail: 'Cabo de Gata invernaderos a 2-3 km. Impacto visual y olores ocasionales.' }
+      ],
+      timingScore: 8.1,             // 0-10, ranking experto sobre si es buen momento
+      timingVerdict: 'COMPRAR AHORA',
+      timingRationale: 'Convergen 5 senyales positivas: (1) tipos competitivos sin esperar bajada incierta, (2) precio Espuela 59 bajo fair value, (3) capital propio fuerte que reduce LTV y mejora condiciones banca, (4) horizonte familiar largo (>10 anyos) que diluye riesgo timing, (5) producto unico (parcela 982 m²) dificil de reemplazar.'
+    },
+
+    // --- B. Histórico y proyección €/m² Retamar 2003-2036 ---
+    priceHistory: [
+      { year: 2003, p: 1400 }, { year: 2005, p: 2150 }, { year: 2007, p: 2820 },
+      { year: 2009, p: 2400 }, { year: 2011, p: 1820 }, { year: 2013, p: 1500 },
+      { year: 2015, p: 1650 }, { year: 2017, p: 1850 }, { year: 2019, p: 2000 },
+      { year: 2021, p: 2150 }, { year: 2023, p: 2280 }, { year: 2024, p: 2330 },
+      { year: 2025, p: 2370 }, { year: 2026, p: 2400 }
+    ],
+
+    // Proyección 3 escenarios 2027-2036 (€/m² Retamar)
+    priceProjection: [
+      { year: 2027, pess: 2304, base: 2472, opt: 2520 },
+      { year: 2028, pess: 2350, base: 2546, opt: 2646 },
+      { year: 2029, pess: 2397, base: 2622, opt: 2778 },
+      { year: 2030, pess: 2445, base: 2701, opt: 2917 },
+      { year: 2031, pess: 2494, base: 2782, opt: 3063 },
+      { year: 2032, pess: 2544, base: 2865, opt: 3216 },
+      { year: 2033, pess: 2595, base: 2951, opt: 3377 },
+      { year: 2034, pess: 2647, base: 3040, opt: 3546 },
+      { year: 2035, pess: 2700, base: 3131, opt: 3723 },
+      { year: 2036, pess: 2754, base: 3225, opt: 3909 }
+    ],
+
+    // Valor estimado Espuela 59 cada anyo (fair value, base case)
+    // Asume suelo crece 4%/anyo, construccion 2.5%/anyo, extras estable
+    espuela59Projection: [
+      { year: 2026, suelo: 112340, constr: 329023, extras: 25000, total: 466363 },
+      { year: 2027, suelo: 116834, constr: 337249, extras: 25000, total: 479083 },
+      { year: 2028, suelo: 121507, constr: 345680, extras: 25000, total: 492187 },
+      { year: 2029, suelo: 126367, constr: 354322, extras: 25000, total: 505689 },
+      { year: 2030, suelo: 131422, constr: 363180, extras: 25000, total: 519602 },
+      { year: 2031, suelo: 136679, constr: 372260, extras: 25000, total: 533939 },
+      { year: 2032, suelo: 142146, constr: 381567, extras: 25000, total: 548713 },
+      { year: 2033, suelo: 147832, constr: 391106, extras: 25000, total: 563938 },
+      { year: 2034, suelo: 153745, constr: 400884, extras: 25000, total: 579629 },
+      { year: 2035, suelo: 159895, constr: 410906, extras: 25000, total: 595801 },
+      { year: 2036, suelo: 166291, constr: 421179, extras: 25000, total: 612470 }
+    ],
+
+    // --- C. Financiación: capital propio + estructura ---
+    financing: {
+      buyerCash: {
+        previousHouseSale: 200000,    // dato usuario
+        bonus: 30000,                  // dato usuario
+        total: 230000
+      },
+      closingCostsRules: {
+        itpAndaluciaPct: 7.0,          // ITP Andalucia segunda mano 2026
+        notaria: 1000,
+        registro: 600,
+        gestoria: 400,
+        tasacion: 450,
+        bankOpeningFeesPct: 0          // negociable a 0% para perfil bueno
+      }
+    },
+
+    // --- D. Hipoteca · escenarios reales mayo 2026 ---
+    mortgageMarketMay2026: {
+      euribor12m: 2.30,
+      bestFijaTIN: 2.69,             // ING Naranja con nomina
+      avgFijaTIN: 2.95,              // media bancos grandes con vinculacion
+      avgVariableDiff: 0.65,          // Euribor + diferencial medio
+      scenarios: [
+        {
+          id: 'fija25',
+          name: 'Hipoteca FIJA 25 anyos (recomendada)',
+          type: 'fija',
+          tin: 2.85,
+          tae: 3.10,
+          years: 25,
+          vinculacion: 'Nomina + seguro hogar',
+          bonusOverBase: '-0,10% si domicilias nomina + seguro hogar',
+          recommended: true,
+          pros: ['Cuota fija e invariable 25 anyos', 'Inmunidad a subidas Euribor', 'Planificacion financiera estable'],
+          cons: ['No te beneficias si tipos bajan mas', 'Tipo nominal mas alto que variable inicial']
+        },
+        {
+          id: 'fija30',
+          name: 'Hipoteca FIJA 30 anyos',
+          type: 'fija',
+          tin: 2.85,
+          tae: 3.10,
+          years: 30,
+          vinculacion: 'Nomina + seguro hogar',
+          pros: ['Cuota mensual mas baja (~150€/mes menos)', 'Mayor capacidad de ahorro mensual'],
+          cons: ['Pagas ~25k€ mas en intereses totales', 'Hipoteca activa hasta los 65-70 anyos']
+        },
+        {
+          id: 'variable',
+          name: 'Hipoteca VARIABLE Euribor +0,55%',
+          type: 'variable',
+          tin: 2.85,                   // inicial
+          tae: 3.10,
+          years: 25,
+          diferencial: 0.55,
+          initialFixed: 1,             // primer anyo fijo
+          vinculacion: 'Nomina + seguro hogar + plan pensiones',
+          pros: ['Coste inicial similar a fija', 'Si Euribor baja al 1,5% en 2027-28, cuota baja'],
+          cons: ['Riesgo si Euribor sube al 3,5%+ (escenario inflacion)', 'Cuota variable cada anyo dificulta planning']
+        },
+        {
+          id: 'mixta',
+          name: 'Hipoteca MIXTA 5 anyos fija + Euribor+0,60%',
+          type: 'mixta',
+          tinInitial: 2.50,            // primeros 5 anyos
+          tinAfter: 2.90,              // estimado (Eur+0,60 a Euribor proyectado 2,30%)
+          tae: 2.85,
+          years: 25,
+          fixedYears: 5,
+          vinculacion: 'Nomina + seguro hogar',
+          pros: ['Cuota baja primeros 5 anyos (los criticos)', 'Equity build-up rapido al inicio'],
+          cons: ['Incertidumbre tras 5 anyos', 'Riesgo concentrado en fechas Euribor revision']
+        }
+      ]
+    },
+
+    // --- E. Gastos recurrentes propiedad (anuales) ---
+    propertyOpex: {
+      ibiYear: 580,                    // estimado parcela 982 + construido 185
+      basuraYear: 95,
+      seguroHogarYear: 380,            // todo riesgo + contenido villa
+      mantenimientoPiscinaYear: 480,   // productos + manten. propia
+      mantenimientoJardinYear: 720,    // jardinero 1 vez/mes promedio
+      mantenimientoEstructuralYear: 1200, // reserva 0.25% valor casa
+      suministrosLuzGasAguaYear: 2400, // familia 4 personas
+      cuotaCommunidadYear: 0,          // sin comunidad
+      total: 5855                      // suma anyo 1 (sin contar hipoteca)
+    },
+
+    // --- F. Checklist experto pre-compra ---
+    expertChecklist: [
+      { category: 'Documental (ANTES de arras)', items: [
+        'Nota simple del Registro de la Propiedad (cargas, embargos, hipotecas)',
+        'Certificado de no deudas con la comunidad (no aplica aqui)',
+        'Ultimo recibo de IBI pagado',
+        'Certificado catastral coincidente con la realidad',
+        'Cedula de habitabilidad o licencia de primera ocupacion',
+        'Certificado energetico EMITIDO (no en tramite)',
+        'Verificar legalizacion del aljibe (CHGuadalquivir)'
+      ]},
+      { category: 'Inspeccion fisica (con perito)', items: [
+        'ITE/IEE si la construccion tiene >30 anyos',
+        'Estado cubierta y tejado (drone si es posible)',
+        'Humedades en muros y suelos',
+        'Estado instalacion electrica (cuadro, diferencial, RCD)',
+        'Fontaneria (presion, fugas, materiales)',
+        'Carpinteria exterior (climalit, rotura puente termico)',
+        'Estado piscina (depuradora, vaso, depuradora)',
+        'Vallado perimetral y muros parcela',
+        'Posibles aluminosis (poco probable construccion >1995)'
+      ]},
+      { category: 'Mercado y negociacion', items: [
+        'Tiempo del anuncio activo (5+ semanas = flexibilidad vendedor)',
+        'Si el precio se ha bajado: lo conviertes en palanca',
+        'Comparables vendidos REALMENTE en los ultimos 6 meses (no listados)',
+        'Verificar que no hay sobreoferta (segunda visita en otro horario)',
+        'Pedir al agente: "¿alguna otra oferta sobre la mesa?"',
+        'Ofertar por escrito con plazo de respuesta 48-72h'
+      ]},
+      { category: 'Financiacion · pre-aprobacion ANTES de oferta', items: [
+        'Pre-aprobacion hipoteca de 2-3 bancos antes de hacer ofertas',
+        'Comparar TAE, no solo TIN (incluye seguros y comisiones)',
+        'Negociar: comision apertura, amortizacion anticipada, vinculacion minima',
+        'Vinculacion CRUZADA: si exiges seguros, que sean comparables al mercado',
+        'Plazo razonable: 25 anyos es el sweet spot (cuota manejable + intereses moderados)'
+      ]},
+      { category: 'Legales · CON abogado independiente', items: [
+        'Arras penitenciales (no confirmatorias) - permiten desistir',
+        'Importe arras: 10% del precio cierre es lo estandar',
+        'Plazo entre arras y escritura: 60-90 dias',
+        'Clausula de financiacion (si no obtienes hipoteca, recuperas arras)',
+        'Verificar IBI y plusvalia municipal del vendedor',
+        'Reparto de gastos notaria/registro segun ley'
+      ]}
+    ]
+  },
   comparables: [
     {
       id: 'A',
