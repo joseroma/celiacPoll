@@ -74,16 +74,16 @@ window.REPORT_DATA = {
       ecbMainRate: 2.25,            // BCE main refi rate (bajado de 4.50% pico 2023)
       euribor12m: 2.30,             // Euribor 12m mayo 2026
       inflationESP: 2.6,            // IPC España interanual
-      housePriceCagrESP_5y: 5.8,    // Apreciación nacional media 5 anyos
-      housePriceCagrRetamar_5y: 4.9,// Apreciación Retamar 5 anyos
+      housePriceCagrESP_5y: 5.8,    // Apreciación nacional media 5 años
+      housePriceCagrRetamar_5y: 4.9,// Apreciación Retamar 5 años
       population: {
         almeria: 760000,
         almeriaCity: 200000,
         annualGrowth: 1.3           // % crecimiento anual Almeria (entre los mas altos Espanya)
       },
       driversFavorable: [
-        { label: 'Tipos en descenso desde 2023', detail: 'BCE bajo del 4,50% al 2,25% entre 2023-2026. Hipotecas mas baratas que en 2 anyos.' },
-        { label: 'Demografia Almeria al alza', detail: '+1,3% poblacion/anyo, top 10 provincias Espanya. Demanda real sostenida.' },
+        { label: 'Tipos en descenso desde 2023', detail: 'BCE bajo del 4,50% al 2,25% entre 2023-2026. Hipotecas mas baratas que en 2 años.' },
+        { label: 'Demografia Almeria al alza', detail: '+1,3% poblacion/año, top 10 provincias Espanya. Demanda real sostenida.' },
         { label: 'Inflacion controlada (2,6%)', detail: 'Vuelta a objetivo BCE. Activos fisicos protegen capital.' },
         { label: 'Energia solar atrae inversion', detail: 'Almeria lider FV en Espanya. Empleos cualificados creando demanda residencial.' },
         { label: 'Hospital Toyo expansion', detail: 'Atrae profesionales sanitarios alta cualificacion. Vector demanda zona.' },
@@ -97,7 +97,7 @@ window.REPORT_DATA = {
       ],
       timingScore: 8.1,             // 0-10, ranking experto sobre si es buen momento
       timingVerdict: 'COMPRAR AHORA',
-      timingRationale: 'Convergen 5 senyales positivas: (1) tipos competitivos sin esperar bajada incierta, (2) precio Espuela 59 bajo fair value, (3) capital propio fuerte que reduce LTV y mejora condiciones banca, (4) horizonte familiar largo (>10 anyos) que diluye riesgo timing, (5) producto unico (parcela 982 m²) dificil de reemplazar.'
+      timingRationale: 'Convergen 5 senyales positivas: (1) tipos competitivos sin esperar bajada incierta, (2) precio Espuela 59 bajo fair value, (3) capital propio fuerte que reduce LTV y mejora condiciones banca, (4) horizonte familiar largo (>10 años) que diluye riesgo timing, (5) producto unico (parcela 982 m²) dificil de reemplazar.'
     },
 
     // --- B. Histórico y proyección €/m² Retamar 2003-2036 ---
@@ -123,8 +123,8 @@ window.REPORT_DATA = {
       { year: 2036, pess: 2754, base: 3225, opt: 3909 }
     ],
 
-    // Valor estimado Espuela 59 cada anyo (fair value, base case)
-    // Asume suelo crece 4%/anyo, construccion 2.5%/anyo, extras estable
+    // Valor estimado Espuela 59 cada año (fair value, base case)
+    // Asume suelo crece 4%/año, construccion 2.5%/año, extras estable
     espuela59Projection: [
       { year: 2026, suelo: 112340, constr: 329023, extras: 25000, total: 466363 },
       { year: 2027, suelo: 116834, constr: 337249, extras: 25000, total: 479083 },
@@ -165,7 +165,7 @@ window.REPORT_DATA = {
       scenarios: [
         {
           id: 'fija25',
-          name: 'Hipoteca FIJA 25 anyos (recomendada)',
+          name: 'Hipoteca FIJA 25 años (recomendada)',
           type: 'fija',
           tin: 2.85,
           tae: 3.10,
@@ -173,19 +173,19 @@ window.REPORT_DATA = {
           vinculacion: 'Nomina + seguro hogar',
           bonusOverBase: '-0,10% si domicilias nomina + seguro hogar',
           recommended: true,
-          pros: ['Cuota fija e invariable 25 anyos', 'Inmunidad a subidas Euribor', 'Planificacion financiera estable'],
+          pros: ['Cuota fija e invariable 25 años', 'Inmunidad a subidas Euribor', 'Planificacion financiera estable'],
           cons: ['No te beneficias si tipos bajan mas', 'Tipo nominal mas alto que variable inicial']
         },
         {
           id: 'fija30',
-          name: 'Hipoteca FIJA 30 anyos',
+          name: 'Hipoteca FIJA 30 años',
           type: 'fija',
           tin: 2.85,
           tae: 3.10,
           years: 30,
           vinculacion: 'Nomina + seguro hogar',
           pros: ['Cuota mensual mas baja (~150€/mes menos)', 'Mayor capacidad de ahorro mensual'],
-          cons: ['Pagas ~25k€ mas en intereses totales', 'Hipoteca activa hasta los 65-70 anyos']
+          cons: ['Pagas ~25k€ mas en intereses totales', 'Hipoteca activa hasta los 65-70 años']
         },
         {
           id: 'variable',
@@ -195,23 +195,23 @@ window.REPORT_DATA = {
           tae: 3.10,
           years: 25,
           diferencial: 0.55,
-          initialFixed: 1,             // primer anyo fijo
+          initialFixed: 1,             // primer año fijo
           vinculacion: 'Nomina + seguro hogar + plan pensiones',
           pros: ['Coste inicial similar a fija', 'Si Euribor baja al 1,5% en 2027-28, cuota baja'],
-          cons: ['Riesgo si Euribor sube al 3,5%+ (escenario inflacion)', 'Cuota variable cada anyo dificulta planning']
+          cons: ['Riesgo si Euribor sube al 3,5%+ (escenario inflacion)', 'Cuota variable cada año dificulta planning']
         },
         {
           id: 'mixta',
-          name: 'Hipoteca MIXTA 5 anyos fija + Euribor+0,60%',
+          name: 'Hipoteca MIXTA 5 años fija + Euribor+0,60%',
           type: 'mixta',
-          tinInitial: 2.50,            // primeros 5 anyos
+          tinInitial: 2.50,            // primeros 5 años
           tinAfter: 2.90,              // estimado (Eur+0,60 a Euribor proyectado 2,30%)
           tae: 2.85,
           years: 25,
           fixedYears: 5,
           vinculacion: 'Nomina + seguro hogar',
-          pros: ['Cuota baja primeros 5 anyos (los criticos)', 'Equity build-up rapido al inicio'],
-          cons: ['Incertidumbre tras 5 anyos', 'Riesgo concentrado en fechas Euribor revision']
+          pros: ['Cuota baja primeros 5 años (los criticos)', 'Equity build-up rapido al inicio'],
+          cons: ['Incertidumbre tras 5 años', 'Riesgo concentrado en fechas Euribor revision']
         }
       ]
     },
@@ -226,7 +226,7 @@ window.REPORT_DATA = {
       mantenimientoEstructuralYear: 1200, // reserva 0.25% valor casa
       suministrosLuzGasAguaYear: 2400, // familia 4 personas
       cuotaCommunidadYear: 0,          // sin comunidad
-      total: 5855                      // suma anyo 1 (sin contar hipoteca)
+      total: 5855                      // suma año 1 (sin contar hipoteca)
     },
 
     // --- F. Checklist experto pre-compra ---
@@ -241,7 +241,7 @@ window.REPORT_DATA = {
         'Verificar legalizacion del aljibe (CHGuadalquivir)'
       ]},
       { category: 'Inspeccion fisica (con perito)', items: [
-        'ITE/IEE si la construccion tiene >30 anyos',
+        'ITE/IEE si la construccion tiene >30 años',
         'Estado cubierta y tejado (drone si es posible)',
         'Humedades en muros y suelos',
         'Estado instalacion electrica (cuadro, diferencial, RCD)',
@@ -264,7 +264,7 @@ window.REPORT_DATA = {
         'Comparar TAE, no solo TIN (incluye seguros y comisiones)',
         'Negociar: comision apertura, amortizacion anticipada, vinculacion minima',
         'Vinculacion CRUZADA: si exiges seguros, que sean comparables al mercado',
-        'Plazo razonable: 25 anyos es el sweet spot (cuota manejable + intereses moderados)'
+        'Plazo razonable: 25 años es el sweet spot (cuota manejable + intereses moderados)'
       ]},
       { category: 'Legales · CON abogado independiente', items: [
         'Arras penitenciales (no confirmatorias) - permiten desistir',
@@ -429,7 +429,7 @@ window.REPORT_DATA = {
 
   // ---------- PRECIO ALQUILER (mayo 2026, €/m²/mes) ----------
   // OJO: Espuela 59 esta a >1km de playa. Reduce viabilidad vacacional.
-  // longTerm aplica todo el anyo, vacation solo si esta cerca playa.
+  // longTerm aplica todo el año, vacation solo si esta cerca playa.
   rental: {
     longTerm:   { retamar: 10.5, almeria: 9.2,  almerimar: 9.0, ejido: 6.8, sanjose: 12.0 },
     vacation:   { // EUR/dia temporada media, villa 4 hab piscina
@@ -504,7 +504,7 @@ window.REPORT_DATA = {
     { name:"Certificado energetico pendiente",  level: 5, note:"Anuncio dice 'en tramite'. Casa de los 90-00 sin calefaccion + ventanas probablemente no premium = probable E o F. Coste emision: ~150 €. Impacto: si sale F, dificulta hipoteca a algunos bancos y rebaja valor 4-6%." },
     { name:"Aljibe / pozo (verificar legalidad)", level: 5, note:"El anuncio menciona aljibe en patio andaluz. Verificar: (a) si es solo elemento ornamental o pozo activo, (b) si tiene legalizacion CHGuadalquivir, (c) calidad agua si se usa para riego/piscina, (d) ITC de mantenimiento." },
     { name:"Distancia a playa >1km",            level: 4, note:"Limita uso turistico vacacional (los inquilinos de Retamar quieren playa <500m). Ventaja: zona mas tranquila, menos turismo de paso. Bueno para vivienda habitual o segunda residencia familiar." },
-    { name:"Parcela grande = mantenimiento",    level: 4, note:"982 m² requieren mantenimiento intensivo: jardinero ocasional (40-80 €/mes), riego automatico, piscina (300-500 €/anyo). Calcular como gasto fijo en la operacion." },
+    { name:"Parcela grande = mantenimiento",    level: 4, note:"982 m² requieren mantenimiento intensivo: jardinero ocasional (40-80 €/mes), riego automatico, piscina (300-500 €/año). Calcular como gasto fijo en la operacion." },
     { name:"Aeropuerto (ruido)",                level: 5, note:"Almeria AP a 4 km. Camino Espuela esta en eje norte-sur de Retamar - cono de aproximacion puede afectar. Comprobar huellas acusticas AESA y la frecuencia real de vuelos (Ryanair, etc)." },
     { name:"Invernaderos colindantes",          level: 4, note:"Al norte de Retamar empieza el mar de plastico de Cabo de Gata. Impacto visual a 1-2 km. Dias de viento sur: olor a pesticida/fitosanitarios ocasional." },
     { name:"Sequia / restricciones agua",       level: 7, note:"Almeria en estres hidrico estructural cronico. Riesgo real de restricciones piscina/riego en proximos veranos. Importante con parcela 982 m² + piscina." },

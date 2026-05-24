@@ -249,7 +249,7 @@
     const reasons = [];
     if (p.heating === false) reasons.push('falta calefacción');
     if (/tramite|pendiente/i.test(p.energyCert || '')) reasons.push('cert. energético sin emitir');
-    if (p.distanceBeachM > 1000) reasons.push('distancia a playa &gt;1km');
+    if (p.distanceBeachM > 1000) reasons.push('distancia a playa más de 1km');
     const reasonsStr = reasons.length ? `por <em>${reasons.join(', ')}</em>` : '';
     verdictTxt = `El vendedor lo ha precificado bajo ${reasonsStr}. Si la due diligence sale limpia (nota simple, peritaje, sin cargas), <strong>cierra rápido</strong>: oferta en ${eur(initialOffer)} (-${((1 - initialOffer / p.askingPrice) * 100).toFixed(1)}% del asking) y cierre realista en ${eur(closingMid)}. Bajar más del 6-7% del asking = riesgo real de que entre otro comprador.`;
   }
@@ -257,7 +257,7 @@
   vb.className = 'verdict-badge ' + verdictClass;
   vb.textContent = verdictBadge;
   document.getElementById('verdictHeadline').textContent = verdictHL;
-  document.getElementById('verdictText').textContent = verdictTxt;
+  document.getElementById('verdictText').innerHTML = verdictTxt;
 
   // ---------- KPI tiles ----------
   document.getElementById('kpiAsk').textContent = eur(p.askingPrice);
@@ -436,7 +436,7 @@
   let strategyHtml;
   if (isUnderPriced) {
     strategyHtml = `
-      <p><strong>Caso atípico:</strong> el precio pedido está <strong style="color:var(--green)">${pct(-deltaPct)} POR DEBAJO</strong> del fair value. El vendedor lo ha precificado bajo por: (a) <em>${p.heating === false ? 'falta de calefacción' : ''}${p.heating === false && /tramite|pendiente/i.test(p.energyCert || '') ? ' + ' : ''}${/tramite|pendiente/i.test(p.energyCert || '') ? 'cert. energético sin emitir' : ''}</em>, (b) distancia a playa &gt;1km que limita el mercado turístico, (c) ${flexNote}.</p>
+      <p><strong>Caso atípico:</strong> el precio pedido está <strong style="color:var(--green)">${pct(-deltaPct)} POR DEBAJO</strong> del fair value. El vendedor lo ha precificado bajo por: (a) <em>${p.heating === false ? 'falta de calefacción' : ''}${p.heating === false && /tramite|pendiente/i.test(p.energyCert || '') ? ' + ' : ''}${/tramite|pendiente/i.test(p.energyCert || '') ? 'cert. energético sin emitir' : ''}</em>, (b) distancia a playa más de 1km que limita el mercado turístico, (c) ${flexNote}.</p>
       <p><strong>Estrategia recomendada — anclar pegado al asking, no fuerzar bajada agresiva.</strong> Si pides menos del 5-6%, riesgo real de perder el inmueble: con ese €/m² (€${num(Math.round(pricePerM2Ask))}/m²) entrará un comprador rival rápido.</p>
       <p><strong>Apertura.</strong> Oferta inicial en <strong>${eur(initialOffer)}</strong> (-${((1 - initialOffer / p.askingPrice) * 100).toFixed(1)}% del asking). Justifica con: (1) coste instalación calefacción ~5-7k €, (2) descuento medio Retamar ${b.sellerDiscountAvgPct}%, (3) cert. energético en trámite (riesgo de salir E/F).</p>
       <p><strong>Cerrar en torno a <span style="color:var(--gold-2)">${eur(Math.round((initialOffer + walkAway) / 2 / 1000) * 1000)}</span>.</strong> Walk-away: ${eur(walkAway)} (el precio pedido). Sobre eso, perderías el descuento "anti-frigción" típico del mercado almeriense.</p>
@@ -609,7 +609,7 @@
     .join('');
 
   // ============================================================
-  // 13. ANALISIS DE EXPERTO · macro + timing + 10 anyos
+  // 13. ANALISIS DE EXPERTO · macro + timing + 10 años
   // ============================================================
   const ev = D.expertView;
   if (ev) {
@@ -647,7 +647,7 @@
       `;
     }
 
-    // ---------- 13.2 Proyeccion 10 anyos ----------
+    // ---------- 13.2 Proyeccion 10 años ----------
     const projChartCanvas = document.getElementById('chartProjection');
     if (projChartCanvas) {
       const hist = ev.priceHistory;
@@ -795,7 +795,7 @@
         let extraNote = '';
         if (s.type === 'mixta') {
           const calcLater = mortgageCalc(principal, s.tinAfter, s.years);
-          extraNote = `<div style="font-size:11px;color:var(--text-mute);margin-top:4px">Cuota anyos 6-25: ~${eur(calcLater.monthly, 0)}/mes (Eur ${ev.macro.euribor12m}% + ${s.diferencial || 0.60}%)</div>`;
+          extraNote = `<div style="font-size:11px;color:var(--text-mute);margin-top:4px">Cuota años 6-25: ~${eur(calcLater.monthly, 0)}/mes (Eur ${ev.macro.euribor12m}% + ${s.diferencial || 0.60}%)</div>`;
         }
         return `
           <div class="mortgage-card ${s.recommended ? 'mortgage-rec' : ''}">
