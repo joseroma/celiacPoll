@@ -64,6 +64,130 @@ window.REPORT_DATA = {
     isEstimated: false
   },
 
+  // ---------- COMPARABLES (otras opciones que el usuario considera) ----------
+  comparables: [
+    {
+      id: 'A',
+      shortName: 'Adosado Retamar',
+      headline: 'Chalet adosado · €425k',
+      url: '',
+      type: 'Chalet adosado',
+      askingPrice: 425000,
+      originalPrice: 450000,           // rebajado
+      builtArea: 170,
+      usableArea: 100,
+      plotArea: 390,
+      bedrooms: 3,
+      bathrooms: 2,
+      floors: 2,                       // estimado adosado
+      yearBuilt: 2005,
+      state: 'Segunda mano / buen estado',
+      heating: true,                   // bomba frío/calor
+      ac: true,
+      pool: 'private',
+      poolType: 'privada',
+      parking: true,
+      garden: true,
+      energyCert: 'En tramite',
+      orientation: 'Oeste',
+      community: 0,                    // dato no claro, asumido 0
+      distanceBeachM: 900,             // Retamar interior estimado
+      distanceSchoolKm: 0.8,
+      listingAgeWeeks: 3,
+      pricePerM2: 2500
+    },
+    {
+      id: 'B',
+      shortName: 'Dúplex Toyo',
+      headline: 'Pareado dúplex · Toyo · €360k',
+      url: '',
+      type: 'Pareado dúplex',
+      askingPrice: 360000,
+      originalPrice: 374000,
+      builtArea: 110,
+      usableArea: 95,
+      plotArea: 160,
+      bedrooms: 3,
+      bathrooms: 3,
+      floors: 2,
+      yearBuilt: 2005,
+      state: 'Segunda mano / buen estado',
+      heating: false,
+      ac: true,
+      pool: 'community',
+      poolType: 'comunitaria (+ padel)',
+      parking: true,
+      garden: false,                   // jardin comunitario
+      energyCert: 'E',                 // consumo y emisiones E
+      orientation: 'Este-Oeste',
+      community: 110,                  // residencial cerrado con servicios
+      distanceBeachM: 1500,            // Toyo más interior
+      distanceSchoolKm: 0.5,
+      distanceHospitalKm: 0.4,         // 5 min walking
+      listingAgeWeeks: 1,
+      pricePerM2: 3273
+    },
+    {
+      id: 'C',
+      shortName: 'Indep. 375k Retamar',
+      headline: 'Chalet independiente · €375k',
+      url: '',
+      type: 'Casa o chalet independiente',
+      askingPrice: 375000,
+      originalPrice: 375000,
+      builtArea: 139,
+      usableArea: 126,
+      plotArea: 421,
+      bedrooms: 3,
+      bathrooms: 2,
+      floors: 2,                       // estimado (no consta)
+      yearBuilt: 2009,
+      state: 'Segunda mano / buen estado',
+      heating: true,                   // individual
+      ac: false,                       // no mencionado
+      pool: 'private',
+      poolType: 'privada',
+      parking: true,
+      garden: true,
+      energyCert: 'E',                 // E consumo / D emisiones
+      energyCertEmissions: 'D',
+      kwhPerM2Year: 138.47,
+      orientation: 'Este, Oeste',
+      community: 80,
+      distanceBeachM: 1000,            // Retamar zona similar a Espuela (estimado)
+      distanceSchoolKm: 1.0,
+      listingAgeWeeks: 4,
+      pricePerM2: 2698,
+      extras: ['Vestidor', 'Baño en suite', 'Solarium', 'Barbacoa', 'Casita madera']
+    }
+  ],
+
+  // ---------- PERFIL FAMILIAR del comprador ----------
+  // Para que el informe valore las opciones desde la lente concreta del usuario.
+  familyProfile: {
+    description: 'Matrimonio + 2 niños + perro mediano',
+    members: { adults: 2, children: 2, dogs: 1, dogSize: 'mediano' },
+    priorities: [
+      { key: 'outdoorSpace', label: 'Espacio exterior (perro + niños)', weight: 20 },
+      { key: 'bedrooms',     label: 'Habitaciones suficientes',          weight: 12 },
+      { key: 'singleFloor',  label: 'Vivienda 1 planta (seguridad niños/perro)', weight: 10 },
+      { key: 'comfortDay1',  label: 'Confort día 1 (calefacción + cert)', weight: 10 },
+      { key: 'totalCost',    label: 'Coste mensual recurrente',           weight: 10 },
+      { key: 'schoolDist',   label: 'Cercanía colegios/servicios',        weight: 8  },
+      { key: 'flexibility',  label: 'Sin reglas comunidad (perro libre)', weight: 8  },
+      { key: 'safety',       label: 'Seguridad / entorno cerrado',        weight: 5  },
+      { key: 'futureValue',  label: 'Revalorización 20 años',             weight: 10 },
+      { key: 'liquidity',    label: 'Liquidez si hay que revender',       weight: 7  }
+    ],
+    // Scoring 0-10 para cada propiedad (incluye Espuela 59 = 'P')
+    scores: {
+      'P': { outdoorSpace: 10, bedrooms: 10, singleFloor: 10, comfortDay1: 4,  totalCost: 9, schoolDist: 7, flexibility: 10, safety: 7,  futureValue: 10, liquidity: 5 },
+      'A': { outdoorSpace: 6,  bedrooms: 7,  singleFloor: 3,  comfortDay1: 9,  totalCost: 8, schoolDist: 8, flexibility: 8,  safety: 6,  futureValue: 6,  liquidity: 8 },
+      'B': { outdoorSpace: 2,  bedrooms: 7,  singleFloor: 1,  comfortDay1: 8,  totalCost: 6, schoolDist: 9, flexibility: 4,  safety: 10, futureValue: 7,  liquidity: 8 },
+      'C': { outdoorSpace: 7,  bedrooms: 7,  singleFloor: 3,  comfortDay1: 9,  totalCost: 7, schoolDist: 8, flexibility: 7,  safety: 6,  futureValue: 7,  liquidity: 8 }
+    }
+  },
+
   // ---------- SERIES HISTORICAS €/m2 (1995-2026) ----------
   // Construidas con: idealista (informes 2007-2026), Fotocasa, Tinsa IMIE
   // (serie desde 2001, base 1000), INE indice de vivienda, Ministerio de
@@ -81,8 +205,10 @@ window.REPORT_DATA = {
     }
   },
 
-  // ---------- COMPARABLES ACTUALES (Idealista + Fotocasa mayo 2026) ----------
-  comparables: [
+  // ---------- COMPARABLES MERCADO ABIERTO (Idealista + Fotocasa mayo 2026) ----------
+  // Listado generico de otros chalets en venta en Retamar (no son los favoritos
+  // del usuario, solo contexto de mercado para el chart de dispersion m²/€)
+  marketComparables: [
     { ref:"Idealista — Villa 4 hab, piscina, 200m playa", area: 240, price: 685000, pricePerM2: 2854, state:"reformada", url:"https://www.idealista.com/venta-viviendas/almeria/retamar/con-chalets/" },
     { ref:"Idealista — Chalet adosado urb. Jardines de Retamar", area: 170, price: 395000, pricePerM2: 2324, state:"buen estado", url:"https://www.idealista.com/venta-viviendas/almeria/retamar/con-chalets-adosados/" },
     { ref:"Idealista — Chalet pareado El Toyo", area: 210, price: 525000, pricePerM2: 2500, state:"reformado", url:"https://www.idealista.com/venta-viviendas/almeria/retamar/" },
@@ -119,9 +245,12 @@ window.REPORT_DATA = {
     ],
 
     // Valor CONSTRUCCION por m² (mercado, no reposicion)
-    // Para villa Retamar segunda mano en buen estado, lo que paga el comprador
-    // por el edificio terminado (incluye prima por evitar obra y trámites).
-    constructionValuePerM2: 1900,      // base "buen estado" — calibrado con comparables
+    // Calibrado con los 4 comparables reales del usuario:
+    //   Espuela 59 (185m², sin calef): asking 480k → fair ~520k → OPORTUNIDAD
+    //   Adosado (170m², con calef):    asking 425k → fair ~406k → NEGOCIAR
+    //   Indep 375k (139m², 2009):       asking 375k → fair ~345k → NEGOCIAR
+    //   Toyo dúplex (110m², residenc):  asking 360k → fair ~221k → CARO (resid. cerrado infravalorado)
+    constructionValuePerM2: 2200,      // base "buen estado" Retamar/Toyo mercado terminado
 
     // Ajustes al valor construccion
     constructionAdjustments: {

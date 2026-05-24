@@ -17,6 +17,60 @@
   }).format(n);
   const pct = (n, dec = 1) => (n >= 0 ? '+' : '') + n.toFixed(dec) + '%';
 
+  // ---------- Helper · calcula fair value de cualquier propiedad ----------
+  // Reutilizable para Espuela 59 y los 3 comparables.
+  function computeFairValue(prop, benchmarks) {
+    const b = benchmarks;
+    const floors = prop.floors || 2;
+    const footprint = prop.builtArea / floors;
+    let remaining = Math.max(0, prop.plotArea - footprint);
+    let landValue = 0;
+    for (const tier of b.plotValueTiers) {
+      if (remaining <= 0) break;
+      const take = Math.min(tier.upto, remaining);
+      landValue += take * tier.valuePerM2;
+      remaining -= take;
+    }
+    const adj = b.constructionAdjustments;
+    let cM2 = b.constructionValuePerM2;
+    if (/reformado|reformada|estrenar|nueva/i.test(prop.state || '')) cM2 *= (1 + adj.reformedPct / 100);
+    if (prop.heating === false) cM2 *= (1 + adj.noHeatingPct / 100);
+    const ec = (prop.energyCert || '').toLowerCase();
+    if (/tramite|pendiente|desconocid/i.test(ec) || !ec) cM2 *= (1 + adj.energyCertPendingPct / 100);
+    else if (/^[ab]$/i.test(ec)) cM2 *= (1 + adj.energyCertGoodPct / 100);
+    else if (/^[fg]$/i.test(ec)) cM2 *= (1 + adj.energyCertBadPct / 100);
+    if (prop.orientation && /sur|sureste|sur, este/i.test(prop.orientation)) cM2 *= (1 + adj.sourceOrientationPct / 100);
+    if (floors === 1) cM2 *= (1 + adj.singleFloorPct / 100);
+    if (prop.pool === 'private' || prop.pool === true) cM2 *= (1 + adj.poolPct / 100);
+    if (!prop.parking) cM2 *= (1 + adj.noParkingPct / 100);
+    let beachKey;
+    const dB = prop.distanceBeachM || 1100;
+    if (dB < 200) beachKey = '<200m';
+    else if (dB < 500) beachKey = '200-500m';
+    else if (dB < 1000) beachKey = '500-1000m';
+    else beachKey = '>1000m';
+    cM2 *= (1 + b.beachProximityAdjPct[beachKey] / 100);
+    const constructionValue = cM2 * prop.builtArea;
+    let extras = 0;
+    if (prop.extras && prop.extras.some(e => /patio andaluz|aljibe/i.test(e))) extras += b.extrasPremiumEur.patioAndaluz;
+    if (prop.extras && prop.extras.some(e => /jardin.*rodea|jardin maduro/i.test(e))) extras += b.extrasPremiumEur.bigGardenMature;
+    if ((prop.communityFeesMonth === 0) || (prop.community === 0)) extras += b.extrasPremiumEur.noCommunityFees;
+    const fair = Math.round(landValue + constructionValue + extras);
+    const delta = prop.askingPrice - fair;
+    const deltaPct = (delta / fair) * 100;
+    return {
+      landValue: Math.round(landValue),
+      constructionValue: Math.round(constructionValue),
+      constructionPerM2: Math.round(cM2),
+      extras,
+      fairValue: fair,
+      delta,
+      deltaPct,
+      verdict: deltaPct > 10 ? 'CARO' : deltaPct > 3 ? 'NEGOCIAR' : deltaPct > -3 ? 'JUSTO' : 'OPORTUNIDAD'
+    };
+  }
+  window.__computeFairValue = computeFairValue;
+
   // ---------- 0. Header / dates / refs ----------
   document.getElementById('reportDate').textContent =
     new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -401,8 +455,9 @@
   }
   document.getElementById('negStrategy').innerHTML = strategyHtml;
 
-  // ---------- 7. Comparables ----------
-  const compHtml = D.comparables.map(c => {
+  // ---------- 7. Comparables (mercado abierto Retamar) ----------
+  const mktComps = D.marketComparables || [];
+  const compHtml = mktComps.map(c => {
     const deltaVsFair = ((c.pricePerM2 / fairPerM2) - 1) * 100;
     return `<div class="comp-item">
       <div class="comp-head">
@@ -428,7 +483,7 @@
       datasets: [
         {
           label: 'Comparables',
-          data: D.comparables.map(c => ({ x: c.area, y: c.pricePerM2 })),
+          data: mktComps.map(c => ({ x: c.area, y: c.pricePerM2 })),
           backgroundColor: '#5aa9ff', pointRadius: 6, pointHoverRadius: 8
         },
         {
@@ -552,5 +607,284 @@
   document.getElementById('sourcesList').innerHTML = D.sources
     .map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.name} ↗</a>`)
     .join('');
+
+  // ============================================================
+  // 11. COMPARATIVA · 4 opciones (Espuela 59 + A, B, C)
+  // ============================================================
+  if (D.comparables && D.comparables.length) {
+    const propAsCompare = {
+      id: 'P', shortName: 'Espuela 59', headline: 'Chalet indep. Espuela 59',
+      type: p.type, askingPrice: p.askingPrice, originalPrice: p.askingPrice,
+      builtArea: p.builtArea, usableArea: p.usableArea, plotArea: p.plotArea,
+      bedrooms: p.bedrooms, bathrooms: p.bathrooms, floors: p.floors,
+      yearBuilt: p.yearBuilt || '~2000', state: p.state,
+      heating: p.heating, ac: false, pool: p.pool ? 'private' : null,
+      poolType: 'privada', parking: p.parking, garden: true,
+      energyCert: p.energyCert, orientation: p.orientation,
+      community: p.communityFeesMonth, distanceBeachM: p.distanceBeachM,
+      distanceSchoolKm: 1.2, listingAgeWeeks: p.listingAgeWeeks,
+      pricePerM2: Math.round(p.askingPrice / p.builtArea),
+      extras: p.extras
+    };
+    const allProps = [propAsCompare, ...D.comparables];
+
+    // Calcula fair value de cada opcion
+    const fvs = allProps.map(prop => ({ ...prop, fv: computeFairValue(prop, D.benchmarks) }));
+
+    // ---------- 11.1 Tabla mercado ----------
+    const compareTableEl = document.getElementById('compareTable');
+    if (compareTableEl) {
+      const rows = [
+        ['Tipo',           p => p.type],
+        ['Precio asking',  p => eur(p.askingPrice), true],
+        ['Precio original',p => p.originalPrice && p.originalPrice !== p.askingPrice ? `${eur(p.originalPrice)} <span style="color:var(--green);font-size:11px">(-${Math.round((1 - p.askingPrice/p.originalPrice) * 100)}%)</span>` : '—'],
+        ['Construidos',    p => `${p.builtArea} m²`],
+        ['Útiles',         p => `${p.usableArea} m² <span style="color:var(--text-dim);font-size:11px">(${Math.round(p.usableArea/p.builtArea*100)}%)</span>`],
+        ['Parcela',        p => `${num(p.plotArea)} m²`, true],
+        ['Hab. / Baños',   p => `${p.bedrooms} / ${p.bathrooms}`],
+        ['Plantas',        p => p.floors || '—'],
+        ['Año',            p => p.yearBuilt || '—'],
+        ['Calefacción',    p => p.heating === true ? '<span style="color:var(--green)">✓</span>' : '<span style="color:var(--red)">✗</span>'],
+        ['A/A',            p => p.ac === true ? '<span style="color:var(--green)">✓</span>' : '—'],
+        ['Piscina',        p => p.pool === 'private' ? '<span style="color:var(--green)">Privada</span>' : p.pool === 'community' ? 'Comunit.' : '—'],
+        ['Cert. energ.',   p => p.energyCert],
+        ['Orientación',    p => p.orientation || '—'],
+        ['Comunidad',      p => p.community ? `${eur(p.community)}/mes` : 'Sin comu.'],
+        ['€/m² construido',p => num(p.pricePerM2)],
+        ['€/m² total (build+plot)', p => num(Math.round(p.askingPrice / (p.builtArea + p.plotArea)))],
+        ['Anuncio activo', p => p.listingAgeWeeks ? `${p.listingAgeWeeks} sem` : '—'],
+        ['Fair value',     p => eur(p.fv.fairValue), true],
+        ['Δ vs asking',    p => {
+          const dp = p.fv.deltaPct;
+          const cls = dp > 10 ? 'neg' : dp > 3 ? 'warn' : dp > -3 ? 'pos' : 'pos';
+          const color = dp > 10 ? 'var(--red)' : dp > 3 ? 'var(--gold-2)' : dp > -3 ? 'var(--green)' : 'var(--green)';
+          return `<span style="color:${color};font-weight:600">${pct(dp, 1)}</span>`;
+        }, true],
+        ['Veredicto modelo', p => {
+          const v = p.fv.verdict;
+          const color = v === 'CARO' ? 'var(--red)' : v === 'NEGOCIAR' ? 'var(--gold-2)' : v === 'JUSTO' ? 'var(--green)' : 'var(--green)';
+          return `<span style="color:${color};font-weight:700;font-size:11px;letter-spacing:.5px">${v}</span>`;
+        }, true]
+      ];
+
+      const headerCells = fvs.map(p => {
+        const isTarget = p.id === 'P';
+        return `<th style="${isTarget ? 'background:rgba(212,175,55,0.1);color:var(--gold-2);font-weight:700;border-left:2px solid var(--gold-2)' : ''}">${isTarget ? '★ ' : ''}${p.shortName}</th>`;
+      }).join('');
+
+      const bodyRows = rows.map(([label, fn, hi]) => {
+        const cells = fvs.map(p => {
+          const isTarget = p.id === 'P';
+          const targetStyle = isTarget ? 'background:rgba(212,175,55,0.05);border-left:2px solid var(--gold-2)' : '';
+          return `<td style="${targetStyle}${hi ? ';font-weight:600' : ''}">${fn(p)}</td>`;
+        }).join('');
+        return `<tr><th class="row-label">${label}</th>${cells}</tr>`;
+      }).join('');
+
+      compareTableEl.innerHTML = `
+        <table class="ctable">
+          <thead><tr><th></th>${headerCells}</tr></thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+      `;
+    }
+
+    // ---------- 11.2 Fair value desglose por inmueble ----------
+    const fvBreakdownEl = document.getElementById('fairValueBreakdown');
+    if (fvBreakdownEl) {
+      const cards = fvs.map(prop => {
+        const isTarget = prop.id === 'P';
+        const verdict = prop.fv.verdict;
+        const vColor = verdict === 'CARO' ? 'var(--red)' : verdict === 'NEGOCIAR' ? 'var(--gold-2)' : 'var(--green)';
+        return `
+          <div class="fv-card ${isTarget ? 'fv-target' : ''}">
+            <div class="fv-head">
+              <div>
+                <div class="fv-name">${isTarget ? '★ ' : ''}${prop.shortName}</div>
+                <div class="fv-sub">${prop.type} · ${prop.builtArea}m² · parcela ${num(prop.plotArea)}m²</div>
+              </div>
+              <div class="fv-verdict" style="color:${vColor}">${verdict}</div>
+            </div>
+            <div class="fv-bars">
+              <div class="fv-bar-row"><span class="fv-bl">Valor suelo</span><span class="fv-br">${eur(prop.fv.landValue)}</span></div>
+              <div class="fv-bar-row"><span class="fv-bl">Valor construcción <small style="color:var(--text-dim)">(@${eur(prop.fv.constructionPerM2)}/m²)</small></span><span class="fv-br">${eur(prop.fv.constructionValue)}</span></div>
+              ${prop.fv.extras ? `<div class="fv-bar-row"><span class="fv-bl">Extras singulares</span><span class="fv-br">${eur(prop.fv.extras)}</span></div>` : ''}
+              <div class="fv-bar-row total"><span class="fv-bl"><strong>Fair value estimado</strong></span><span class="fv-br"><strong>${eur(prop.fv.fairValue)}</strong></span></div>
+              <div class="fv-bar-row"><span class="fv-bl">Precio pedido</span><span class="fv-br">${eur(prop.askingPrice)}</span></div>
+              <div class="fv-bar-row" style="border-top:1px dashed var(--line);padding-top:6px;margin-top:6px"><span class="fv-bl" style="color:${vColor};font-weight:600">Diferencia vs fair</span><span class="fv-br" style="color:${vColor};font-weight:700">${pct(prop.fv.deltaPct, 1)} · ${eur(prop.fv.delta)}</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      fvBreakdownEl.innerHTML = cards;
+    }
+
+    // ---------- 11.3 Chart comparativo prices vs fair value ----------
+    const compareCtx = document.getElementById('chartCompare');
+    if (compareCtx) {
+      new Chart(compareCtx, {
+        type: 'bar',
+        data: {
+          labels: fvs.map(p => p.shortName),
+          datasets: [
+            {
+              label: 'Precio pedido (€)',
+              data: fvs.map(p => p.askingPrice),
+              backgroundColor: fvs.map(p => p.id === 'P' ? 'rgba(212,175,55,0.7)' : 'rgba(180,180,180,0.5)'),
+              borderColor: fvs.map(p => p.id === 'P' ? '#d4af37' : '#888'),
+              borderWidth: 2
+            },
+            {
+              label: 'Fair value (€)',
+              data: fvs.map(p => p.fv.fairValue),
+              backgroundColor: fvs.map(p => p.id === 'P' ? 'rgba(46,160,67,0.7)' : 'rgba(46,160,67,0.4)'),
+              borderColor: '#2ea043',
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#a8a8a8', font: { size: 11 } } },
+            tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${eur(ctx.raw)}` } }
+          },
+          scales: {
+            y: { ticks: { color: '#a8a8a8', callback: v => (v / 1000) + 'k' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            x: { ticks: { color: '#a8a8a8', font: { size: 11 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // ============================================================
+    // 12. SCORING FAMILIAR · matriz ponderada
+    // ============================================================
+    if (D.familyProfile) {
+      const fp = D.familyProfile;
+      const totalWeight = fp.priorities.reduce((a, p) => a + p.weight, 0);
+
+      // Computa score ponderado
+      const propIds = ['P', 'A', 'B', 'C'];
+      const propLabels = { P: '★ Espuela 59', A: 'Adosado', B: 'Toyo', C: 'Indep. 375k' };
+      const weightedScores = {};
+      propIds.forEach(id => {
+        const s = fp.scores[id] || {};
+        let total = 0;
+        fp.priorities.forEach(pr => { total += (s[pr.key] || 0) * pr.weight; });
+        weightedScores[id] = total / totalWeight;
+      });
+
+      // Ranking
+      const ranked = propIds.slice().sort((a, b) => weightedScores[b] - weightedScores[a]);
+      const winner = ranked[0];
+
+      const scoringEl = document.getElementById('familyScoring');
+      if (scoringEl) {
+        const headerCells = propIds.map(id => {
+          const isWin = id === winner;
+          const isTarget = id === 'P';
+          return `<th style="${isTarget ? 'color:var(--gold-2);border-left:2px solid var(--gold-2)' : ''}${isWin ? ';background:rgba(46,160,67,0.15)' : ''}">${propLabels[id]}${isWin ? ' 🏆' : ''}</th>`;
+        }).join('');
+
+        const bodyRows = fp.priorities.map(pr => {
+          const cells = propIds.map(id => {
+            const score = fp.scores[id][pr.key] || 0;
+            const bgIntensity = score / 10;
+            const color = score >= 8 ? `rgba(46,160,67,${bgIntensity * 0.4})` : score >= 5 ? `rgba(212,175,55,${bgIntensity * 0.3})` : `rgba(248,81,73,${(1 - bgIntensity) * 0.3})`;
+            const isTarget = id === 'P';
+            return `<td style="text-align:center;background:${color};${isTarget ? 'border-left:2px solid var(--gold-2)' : ''}"><strong>${score}</strong>/10</td>`;
+          }).join('');
+          return `<tr><th class="row-label">${pr.label}<small style="display:block;color:var(--text-dim);font-weight:400;font-size:11px">peso ${pr.weight}%</small></th>${cells}</tr>`;
+        }).join('');
+
+        const totalRow = `<tr style="border-top:2px solid var(--gold-2);background:rgba(212,175,55,0.05)"><th class="row-label" style="color:var(--gold-2);font-weight:700">PUNTUACIÓN FINAL</th>${propIds.map(id => {
+          const sc = weightedScores[id];
+          const isWin = id === winner;
+          const isTarget = id === 'P';
+          return `<td style="text-align:center;${isTarget ? 'border-left:2px solid var(--gold-2);' : ''}${isWin ? 'background:rgba(46,160,67,0.25);' : ''}font-size:18px;font-weight:700;color:${isWin ? 'var(--green)' : 'var(--text)'}">${sc.toFixed(1)}/10${isWin ? ' 🏆' : ''}</td>`;
+        }).join('')}</tr>`;
+
+        scoringEl.innerHTML = `
+          <table class="ctable">
+            <thead><tr><th>Prioridad familiar (peso)</th>${headerCells}</tr></thead>
+            <tbody>${bodyRows}${totalRow}</tbody>
+          </table>
+        `;
+      }
+
+      // Veredicto familiar
+      const verdictEl = document.getElementById('familyVerdict');
+      if (verdictEl) {
+        const winnerName = { P: 'Espuela 59 (chalet exento)', A: 'Adosado (425k)', B: 'Dúplex Toyo (360k)', C: 'Indep. Retamar 375k' }[winner];
+        const winnerScore = weightedScores[winner].toFixed(1);
+        const runnerUp = ranked[1];
+        const runnerUpName = { P: 'Espuela 59', A: 'Adosado 425k', B: 'Dúplex Toyo', C: 'Indep. 375k' }[runnerUp];
+        const gap = (weightedScores[winner] - weightedScores[runnerUp]).toFixed(1);
+
+        verdictEl.innerHTML = `
+          <div class="winner-banner">
+            <div class="winner-label">🏆 MEJOR OPCIÓN PARA VUESTRO PERFIL</div>
+            <div class="winner-title">${winnerName}</div>
+            <div class="winner-score">Puntuación ponderada: <strong>${winnerScore}/10</strong> · ${gap} puntos por delante de ${runnerUpName}</div>
+          </div>
+          <div class="card-narrative" style="margin-top:16px">
+            <p><strong>Por qué Espuela 59 gana para una familia con perro mediano + 2 niños + matrimonio:</strong></p>
+            <ul style="padding-left:20px;line-height:1.7;color:var(--text)">
+              <li><strong>Parcela 982 m²</strong> — el perro mediano necesita 200-400 m² de carrera libre diaria. Espuela tiene 800m² aprovechables (3-4× lo necesario). En las otras opciones (A: 305m²; C: 280m²; B: ~0) el perro pasaría más tiempo encerrado o en paseos forzados.</li>
+              <li><strong>1 sola planta</strong> — clave con niños pequeños (no caen escaleras) y perro envejeciendo. Las otras 3 opciones son todas a 2 plantas / dúplex.</li>
+              <li><strong>4 habitaciones</strong> — master + dormitorio niños + 2ª habitación niños + despacho/cuarto invitados. Las otras se quedan en 3 hab (suficiente pero apretado a 10-15 años vista cuando los niños crezcan).</li>
+              <li><strong>Sin comunidad</strong> — perro suelto en parcela sin reglas, libertad para BBQ ruidosas, instalar caseta, etc. En el dúplex de Toyo el reglamento limita perros, ruidos y modificaciones.</li>
+              <li><strong>Asset que protege capital</strong> — 23% del precio es suelo. En 20 años, cuando los niños se vayan, podéis vender Espuela revalorizada o quedaros con la casa (sin escaleras, ideal jubilación).</li>
+              <li><strong>Patio andaluz + jardín maduro</strong> — entorno "respirable" para los niños, mejor que un patio de cemento.</li>
+            </ul>
+            <p><strong>Lo que tendréis que asumir si compráis Espuela 59:</strong></p>
+            <ul style="padding-left:20px;line-height:1.7;color:var(--text-dim)">
+              <li>Instalar calefacción tras compra (~6-8k €) — palanca de negociación, no problema real.</li>
+              <li>Cert. energético sin emitir — pedirlo antes de firmar arras.</li>
+              <li>Mantenimiento jardín 982 m² requiere jardinero ocasional (~40-60 €/mes) o dedicación familiar de fin de semana.</li>
+              <li>Liquidez de salida más lenta (6-9 meses) si necesitáis revender en urgencia.</li>
+            </ul>
+            <p><strong>Si se descarta Espuela 59</strong> (por presupuesto o por la falta de calefacción que no os compense), <strong>el plan B es ${runnerUpName}</strong> con ${weightedScores[runnerUp].toFixed(1)}/10. Diferencia neta de presupuesto: <strong>${winner === 'P' ? eur(p.askingPrice - (D.comparables.find(c => c.id === runnerUp) || {askingPrice: p.askingPrice}).askingPrice) : '—'}</strong>.</p>
+          </div>
+        `;
+      }
+
+      // Estrategia comprar varias
+      const strategyEl = document.getElementById('shoppingStrategy');
+      if (strategyEl) {
+        strategyEl.innerHTML = `
+          <p><strong>Orden recomendado de visitas:</strong></p>
+          <ol style="padding-left:20px;line-height:1.8">
+            <li><strong>Visitar C (Indep. Retamar 375k) PRIMERO</strong> — Establece la baseline: ¿qué da un chalet exento Retamar a precio ajustado? Año 2009, calefacción, cert emitido. Pide nota simple + ITE el mismo día. Si os enamora, ofertad <strong>${eur(355000)}</strong> (cierre realista).</li>
+            <li><strong>Visitar Espuela 59 con la referencia de C en cabeza.</strong> Pregunta clave al vendedor: <em>"¿por qué su chalet vale 105k más que el de Mya Inmobiliaria si no tiene calefacción?"</em>. Esa pregunta es la palanca para bajarle a <strong>${eur(450000)}</strong>.</li>
+            <li><strong>Visitar A (Adosado 425k)</strong> como plan-B de presupuesto medio. Si parcela 390 m² os parece "suficiente" para el perro, este es buen producto con calefacción incluida y rebaja ya aplicada (-6%).</li>
+            <li><strong>Visitar B (Dúplex Toyo) último</strong> — sólo tiene sentido si valoráis residencial cerrado con servicios por encima del espacio (perfil no familiar con perro). Probablemente lo descartaréis al visitar.</li>
+          </ol>
+          <p style="margin-top:14px"><strong>Tabla de ofertas y cierre realista:</strong></p>
+          <table class="ctable" style="margin-top:8px">
+            <thead><tr><th>Inmueble</th><th>Asking</th><th>Apertura</th><th>Cierre realista</th><th>Walk-away</th><th>Ahorro</th></tr></thead>
+            <tbody>
+              ${fvs.map(prop => {
+                const isTarget = prop.id === 'P';
+                const open = Math.round(prop.askingPrice * 0.90 / 1000) * 1000;
+                const close = Math.round((prop.askingPrice * 0.94) / 1000) * 1000;
+                const walkaway = Math.round((prop.fv.fairValue * 1.02) / 1000) * 1000;
+                const saving = prop.askingPrice - close;
+                return `<tr style="${isTarget ? 'background:rgba(212,175,55,0.05)' : ''}">
+                  <td style="${isTarget ? 'border-left:2px solid var(--gold-2);font-weight:600' : ''}">${isTarget ? '★ ' : ''}${prop.shortName}</td>
+                  <td>${eur(prop.askingPrice)}</td>
+                  <td style="color:var(--text-dim)">${eur(open)}</td>
+                  <td style="color:var(--green);font-weight:700">${eur(close)}</td>
+                  <td style="color:var(--red)">${eur(walkaway)}</td>
+                  <td style="color:var(--green)">${eur(saving)} (${pct(-saving/prop.askingPrice*100, 1)})</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+  }
 
 })();

@@ -311,6 +311,131 @@
   }
   .tab.active { background: var(--bg); color: var(--gold-2); }
 
+  /* ---------- TABLA COMPARATIVA ---------- */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -6px;
+    padding: 0 6px;
+  }
+  .ctable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: transparent;
+  }
+  .ctable thead th {
+    background: var(--bg-3);
+    color: var(--text);
+    text-align: center;
+    padding: 10px 8px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .ctable td, .ctable th.row-label {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    text-align: center;
+    color: var(--text-dim);
+  }
+  .ctable th.row-label {
+    text-align: left;
+    color: var(--text-mute);
+    background: var(--bg-2);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    min-width: 130px;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+  }
+  .ctable tbody tr:hover td { background: rgba(212,175,55,0.03); }
+
+  /* ---------- FAIR VALUE BREAKDOWN CARDS ---------- */
+  #fairValueBreakdown { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  .fv-card {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+  }
+  .fv-card.fv-target {
+    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+    border-color: rgba(212,175,55,0.4);
+    box-shadow: 0 0 0 1px rgba(212,175,55,0.15) inset;
+  }
+  .fv-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .fv-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .fv-sub { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+  .fv-verdict {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    background: var(--bg);
+    padding: 5px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .fv-bars { display: flex; flex-direction: column; gap: 5px; }
+  .fv-bar-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 3px 0;
+  }
+  .fv-bar-row.total {
+    border-top: 1px solid var(--line);
+    padding-top: 7px;
+    margin-top: 4px;
+    font-size: 13px;
+  }
+  .fv-bl { color: var(--text-dim); }
+  .fv-br { color: var(--text); font-weight: 600; }
+
+  /* ---------- WINNER BANNER ---------- */
+  .winner-banner {
+    background: linear-gradient(135deg, rgba(46,160,67,0.18), rgba(46,160,67,0.05));
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+  .winner-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--green);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .winner-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    margin: 4px 0;
+    line-height: 1.2;
+  }
+  .winner-score {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+  .card-narrative p { font-size: 13.5px; line-height: 1.65; margin: 10px 0 6px; }
+  .card-narrative ul li { font-size: 13px; margin-bottom: 6px; }
+  .card-narrative ul li strong { color: var(--gold-2); }
+
   /* ---------- DESKTOP ---------- */
   @media (min-width: 720px) {
     body { font-size: 16px; }
@@ -320,6 +445,8 @@
     .datagrid { grid-template-columns: repeat(3, 1fr); }
     .datagrid .dg-item:nth-last-child(-n+2) { border-bottom: 1px dashed var(--line); }
     .datagrid .dg-item:nth-last-child(-n+3) { border-bottom: 0; }
+    #fairValueBreakdown { grid-template-columns: repeat(2, 1fr); }
+    .ctable { font-size: 13px; }
   }
 </style>
 </head>
@@ -459,10 +586,79 @@
     </details>
   </section>
 
-  <!-- ========== § 05 COMPARABLES ========== -->
+  <!-- ========== § 04B · MERCADO 4 OPCIONES ========== -->
   <section>
     <div class="section-head">
-      <h2 class="section-title"><span class="num">05</span> Comparables activos</h2>
+      <h2 class="section-title"><span class="num">★</span> Las 4 opciones sobre la mesa</h2>
+      <div class="section-tag">Espuela 59 vs 3 alternativas</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Comparativa directa · todas las dimensiones</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Cuatro inmuebles del mismo eje geográfico (Retamar / El Toyo) en presupuestos solapados.
+        La columna <strong style="color:var(--gold-2)">★ Espuela 59</strong> es vuestra favorita.
+        Compárala fila a fila — los <strong style="color:var(--green)">verdes</strong> son ventaja, los <strong style="color:var(--red)">rojos</strong> son desventaja.
+      </p>
+      <div class="table-scroll"><div id="compareTable"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Precio pedido vs Fair value · visualización</div>
+      <div class="chart-wrap" style="height:280px"><canvas id="chartCompare"></canvas></div>
+      <p style="font-size:12px;color:var(--text-mute);margin:8px 0 0">
+        Si la barra <strong style="color:#d4af37">dorada</strong> (asking) es más alta que la <strong style="color:#2ea043">verde</strong> (fair value) → sobre-precio. Si es al revés → oportunidad.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== § 04C · FAIR VALUE COMPARADO ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Fair value desglosado · una a una</h2>
+      <div class="section-tag">Modelo tasador suelo+construcción</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cómo se construye el valor objetivo de cada inmueble</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Para cada propiedad calculamos: <strong>valor del suelo</strong> (parcela en tramos a €80/150/220 por m²) +
+        <strong>valor construcción</strong> (€/m² base ajustado por calefacción, certificado energético, orientación, plantas, piscina, distancia playa) +
+        <strong>extras singulares</strong> (patio andaluz, jardín maduro, sin comunidad).
+      </p>
+      <div id="fairValueBreakdown"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 04D · IDONEIDAD FAMILIAR ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">★</span> Idoneidad para vuestra familia</h2>
+      <div class="section-tag">Matrimonio · 2 niños · perro mediano</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Matriz de puntuación ponderada</div>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px">
+        Cada propiedad recibe una nota <strong>0-10</strong> en cada dimensión que importa para vuestro perfil familiar.
+        El peso de cada dimensión (en %) refleja vuestras prioridades.
+        Las columnas se ponderan y se suman → puntuación final 0-10.
+      </p>
+      <div class="table-scroll"><div id="familyScoring"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Veredicto familiar</div>
+      <div id="familyVerdict"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Estrategia de compra · orden de visitas y ofertas</div>
+      <div id="shoppingStrategy"></div>
+    </div>
+  </section>
+
+  <!-- ========== § 05 COMPARABLES MERCADO ABIERTO ========== -->
+  <section>
+    <div class="section-head">
+      <h2 class="section-title"><span class="num">05</span> Otros comparables del barrio</h2>
       <div class="section-tag">Retamar · Idealista</div>
     </div>
     <div class="card">
